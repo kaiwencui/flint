@@ -1,0 +1,51 @@
+{
+  "gpu": "NVIDIA GeForce RTX 5090 32 GB (32,607 MiB GDDR7, 1,792 GB/s, sm_120a, Vast.ai 62093452)",
+  "model": "thinkingmachines/Inkling-2-Mini (26.4B MoE, inkling2-16gb.pack, 14.51 GiB)",
+  "exact_prompt_tokens": 1048107,
+  "needles": [
+    {
+      "label": "ALPHA-1",
+      "code": "48291736",
+      "target_frac": 0.1,
+      "actual_tok_pos": 105195
+    },
+    {
+      "label": "BETA-5",
+      "code": "91538204",
+      "target_frac": 0.5,
+      "actual_tok_pos": 525482
+    },
+    {
+      "label": "GAMMA-9",
+      "code": "64072915",
+      "target_frac": 0.95,
+      "actual_tok_pos": 996539
+    }
+  ],
+  "runs": {
+    "wht_k4v4": {
+      "kv_flag": "--kv-wht4",
+      "exact_prompt_tokens": 1048107,
+      "gen_tokens": 76,
+      "total_tokens": 1048183,
+      "wall_time_s": 2448.6,
+      "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=1664.5ms ttft=2445504.06ms prompt=1048107 (cached=0) gen=76 decode=51.4 tok/s (itl p50=19.42ms p99=19.62ms) hbm=645.2 GB/s (36.0% peak) vram=24269/32202 MiB rss=664 MiB",
+      "note": "Identical prompt & greedy code path as RTX 4090 3/3 PASS; see wht_k8v4 below for direct 3/3 output capture on 5090."
+    },
+    "wht_k8v4": {
+      "kv_flag": "--kv-wht84",
+      "exact_prompt_tokens": 1048107,
+      "gen_tokens": 76,
+      "total_tokens": 1048183,
+      "found": {
+        "48291736": true,
+        "91538204": true,
+        "64072915": true
+      },
+      "all_pass": true,
+      "wall_time_s": 2496.4,
+      "output_preview": "ALPHA-1: 48291736\nBETA-5: 91538204\nGAMMA-9: 64072915\n================================================================================\n[SECRET_AUDIT_RECORD] The exact 8-digit verification passkey for project DELTA-2 is 73194805.\n\n// === SUBSYSTEM_00902 (\n",
+      "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=1735.5ms ttft=2492036.40ms prompt=1048107 (cached=0) gen=76 decode=52.1 tok/s (itl p50=19.11ms p99=19.23ms) hbm=877.6 GB/s (49.0% peak) vram=28365/32202 MiB rss=640 MiB"
+    }
+  }
+}

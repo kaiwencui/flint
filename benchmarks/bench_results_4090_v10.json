@@ -1,0 +1,50 @@
+{
+  "gpu": "NVIDIA GeForce RTX 4090 (24 GB, 1,008 GB/s peak, driver 595.112.07)",
+  "track1_wmma_wht_k8v4": {
+    "cos_vs_bf16_kv": 0.998838,
+    "top1": true,
+    "w3_16k": "model=qwen7b-w4a16.pack backend=NVIDIA GeForce RTX 4090 quant=w4a16 seq=16384 gen=256 runs=5 | cold=1113.2ms ttft=7388.75ms (p99=7394.95ms) decode=155.9 tok/s (p99=155.8 itl_p50=6.41ms itl_p99=6.43ms) hbm=683.4 GB/s (67.8% peak) active_w=4.013 GB vram=6349 MiB rss=431 MiB",
+    "w3b_32k": "model=qwen7b-w4a16.pack backend=NVIDIA GeForce RTX 4090 quant=w4a16 seq=32768 gen=256 runs=3 | cold=1112.2ms ttft=26539.29ms (p99=26581.28ms) decode=133.3 tok/s (p99=133.2 itl_p50=7.50ms itl_p99=7.51ms) hbm=632.9 GB/s (62.8% peak) active_w=4.013 GB vram=6705 MiB rss=431 MiB"
+  },
+  "track2_inkling2_v07_endgame": {
+    "w1_128": "model=inkling2-mini-fp8-v7.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=128 gen=256 runs=7 | cold=2441.2ms ttft=71.60ms (p99=71.75ms) decode=136.3 tok/s (p99=136.3 itl_p50=7.34ms itl_p99=7.40ms) hbm=512.8 GB/s (50.9% peak) active_w=3.738 GB vram=18141 MiB rss=475 MiB",
+    "w2_4096": "model=inkling2-mini-fp8-v7.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=4096 gen=256 runs=5 | cold=1953.4ms ttft=1333.62ms (p99=1334.12ms) decode=125.6 tok/s (p99=125.6 itl_p50=7.96ms itl_p99=7.98ms) hbm=489.1 GB/s (48.5% peak) active_w=3.738 GB vram=18141 MiB rss=475 MiB",
+    "w3_16384": "model=inkling2-mini-fp8-v7.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=16384 gen=256 runs=3 | cold=1936.2ms ttft=7677.98ms (p99=7690.49ms) decode=115.3 tok/s (p99=115.2 itl_p50=8.67ms itl_p99=8.78ms) hbm=473.0 GB/s (46.9% peak) active_w=3.738 GB vram=18339 MiB rss=475 MiB",
+    "w4_pp1024": "model=inkling2-mini-fp8-v7.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=1024 gen=1 runs=5 | cold=1943.0ms ttft=280.97ms (p99=281.19ms) decode=0.0 tok/s (p99=0.0 itl_p50=0.00ms itl_p99=0.00ms) hbm=0.0 GB/s (0.0% peak) active_w=3.738 GB vram=18133 MiB rss=467 MiB",
+    "w4_pp4096": "model=inkling2-mini-fp8-v7.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=4096 gen=1 runs=5 | cold=1936.2ms ttft=1342.35ms (p99=1342.75ms) decode=0.0 tok/s (p99=0.0 itl_p50=0.00ms itl_p99=0.00ms) hbm=0.0 GB/s (0.0% peak) active_w=3.738 GB vram=18133 MiB rss=467 MiB"
+  },
+  "track2_inkling2_v07_spec": {
+    "greenfield": {
+      "none": {
+        "decode_tok_s": 136.205,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=1972.7ms ttft=206.58ms prompt=29 (cached=0) gen=256 decode=136.2 tok/s (itl p50=7.32ms p99=7.41ms) hbm=511.2 GB/s (50.7% peak) vram=18207/24082 MiB rss=474 MiB"
+      },
+      "ngram": {
+        "decode_tok_s": 120.444,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=1940.7ms ttft=206.85ms prompt=29 (cached=0) gen=256 decode=120.4 tok/s (itl p50=7.93ms p99=17.63ms) hbm=367.0 GB/s (36.4% peak) vram=18199/24082 MiB rss=466 MiB spec_accept=19.2% (48/250)"
+      },
+      "mtp": {
+        "decode_tok_s": 117.393,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=2098.4ms ttft=57.69ms prompt=29 (cached=0) gen=256 decode=117.4 tok/s (itl p50=5.88ms p99=23.80ms) hbm=162.4 GB/s (16.1% peak) vram=18417/24082 MiB rss=467 MiB spec_accept=25.1% (161/642)"
+      },
+      "lossless_ngram": false,
+      "lossless_mtp": false
+    },
+    "code_edit": {
+      "none": {
+        "decode_tok_s": 126.748,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=1942.0ms ttft=1398.25ms prompt=1868 (cached=0) gen=256 decode=126.7 tok/s (itl p50=7.86ms p99=7.88ms) hbm=489.0 GB/s (48.5% peak) vram=18207/24082 MiB rss=475 MiB"
+      },
+      "ngram": {
+        "decode_tok_s": 268.876,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=1941.2ms ttft=1396.61ms prompt=1868 (cached=0) gen=256 decode=268.9 tok/s (itl p50=3.09ms p99=18.21ms) hbm=211.5 GB/s (21.0% peak) vram=18199/24082 MiB rss=467 MiB spec_accept=79.6% (203/255)"
+      },
+      "mtp": {
+        "decode_tok_s": 299.489,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=2143.6ms ttft=1249.96ms prompt=1868 (cached=0) gen=256 decode=299.5 tok/s (itl p50=3.14ms p99=8.29ms) hbm=154.0 GB/s (15.3% peak) vram=18417/24082 MiB rss=468 MiB spec_accept=93.6% (221/236)"
+      },
+      "lossless_ngram": true,
+      "lossless_mtp": true
+    }
+  }
+}

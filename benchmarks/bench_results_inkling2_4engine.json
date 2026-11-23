@@ -1,0 +1,483 @@
+{
+  "hardware": "NVIDIA GeForce RTX 5090 (32 GB GDDR7, 1,792 GB/s peak, sm_120, driver 595.91.07, CUDA 12.8.93)",
+  "model": "thinkingmachines/Inkling-2-Mini (26.4B total, 48 logical visits, NVFP4 L0..19 + MXFP8 L20..23, text-only)",
+  "methodology": "Single RTX 5090 pod (y8q1465vjlcawq), batch=1, greedy temp=0.0, ignore_eos=true, ctx=17408, OpenAI HTTP/SSE + direct bench",
+  "versions": {
+    "flint": "v0.7 (commit 953a678, single stripped C++23+CUDA binary)",
+    "vllm": "0.34.0rc1.dev1130+g8c17e4692 (official nightly wheel, FlashAttn + FlashInfer)",
+    "sglang": "0.5.6.post3.dev15390+g9c64454bb (official Inkling-2-Mini PR #51926, FA4)",
+    "llama_cpp": "b052049 (sm_120 CUDA, ggml-org/Inkling-2-Mini-IQ4_NL.gguf)"
+  },
+  "flint_http": {
+    "flint_nvfp4_base": {
+      "w1_128": {
+        "ttft_ms": 155.73,
+        "decode_tok_s": 134.4,
+        "itl_p50_ms": 7.41,
+        "itl_p99_ms": 7.52,
+        "gen_tokens": 256,
+        "vram_mib": 19750
+      },
+      "w2_4096": {
+        "ttft_ms": 2086.65,
+        "decode_tok_s": 122.6,
+        "itl_p50_ms": 8.13,
+        "itl_p99_ms": 8.2,
+        "gen_tokens": 256,
+        "vram_mib": 19750
+      },
+      "w3_16384": {
+        "ttft_ms": 9915.54,
+        "decode_tok_s": 111.4,
+        "itl_p50_ms": 8.94,
+        "itl_p99_ms": 9.01,
+        "gen_tokens": 256,
+        "vram_mib": 19750
+      },
+      "w4_pp1024": {
+        "ttft_ms": 496.92,
+        "decode_tok_s": 2.0,
+        "itl_p50_ms": 0.0,
+        "itl_p99_ms": 0.0,
+        "gen_tokens": 1,
+        "vram_mib": 19750
+      },
+      "w4_pp4096": {
+        "ttft_ms": 2106.89,
+        "decode_tok_s": 0.5,
+        "itl_p50_ms": 0.0,
+        "itl_p99_ms": 0.0,
+        "gen_tokens": 1,
+        "vram_mib": 19750
+      },
+      "w5_prefix_cache": {
+        "cold_ttft_ms": 3894.57,
+        "hit_ttft_ms": 3897.39
+      },
+      "w7_greenfield": {
+        "ttft_ms": 40.18,
+        "decode_tok_s": 135.3,
+        "itl_p50_ms": 7.36,
+        "itl_p99_ms": 7.47,
+        "gen_tokens": 256,
+        "vram_mib": 19750
+      },
+      "w7_code_edit": {
+        "ttft_ms": 1087.72,
+        "decode_tok_s": 124.4,
+        "itl_p50_ms": 8.0,
+        "itl_p99_ms": 8.06,
+        "gen_tokens": 256,
+        "vram_mib": 19750
+      },
+      "peak_vram_mib": 19750,
+      "host_mem": {
+        "rss_mib": 595.9,
+        "private_dirty_mib": 490.9
+      },
+      "cold_ready_s": 58.69,
+      "cold_to_first_tok_s": 58.78
+    },
+    "flint_fp8_base": {
+      "w1_128": {
+        "ttft_ms": 160.77,
+        "decode_tok_s": 156.7,
+        "itl_p50_ms": 6.35,
+        "itl_p99_ms": 6.45,
+        "gen_tokens": 256,
+        "vram_mib": 18446
+      },
+      "w2_4096": {
+        "ttft_ms": 2120.07,
+        "decode_tok_s": 141.0,
+        "itl_p50_ms": 7.06,
+        "itl_p99_ms": 7.12,
+        "gen_tokens": 256,
+        "vram_mib": 18446
+      },
+      "w3_16384": {
+        "ttft_ms": 10082.38,
+        "decode_tok_s": 126.8,
+        "itl_p50_ms": 7.85,
+        "itl_p99_ms": 7.93,
+        "gen_tokens": 256,
+        "vram_mib": 18446
+      },
+      "w4_pp1024": {
+        "ttft_ms": 506.64,
+        "decode_tok_s": 1.9,
+        "itl_p50_ms": 0.0,
+        "itl_p99_ms": 0.0,
+        "gen_tokens": 1,
+        "vram_mib": 18446
+      },
+      "w4_pp4096": {
+        "ttft_ms": 2135.31,
+        "decode_tok_s": 0.5,
+        "itl_p50_ms": 0.0,
+        "itl_p99_ms": 0.0,
+        "gen_tokens": 1,
+        "vram_mib": 18446
+      },
+      "w5_prefix_cache": {
+        "cold_ttft_ms": 3939.81,
+        "hit_ttft_ms": 3944.5
+      },
+      "w7_greenfield": {
+        "ttft_ms": 44.01,
+        "decode_tok_s": 158.1,
+        "itl_p50_ms": 6.3,
+        "itl_p99_ms": 6.41,
+        "gen_tokens": 256,
+        "vram_mib": 18446
+      },
+      "w7_code_edit": {
+        "ttft_ms": 1107.04,
+        "decode_tok_s": 143.5,
+        "itl_p50_ms": 6.94,
+        "itl_p99_ms": 6.99,
+        "gen_tokens": 256,
+        "vram_mib": 18446
+      },
+      "peak_vram_mib": 18446,
+      "host_mem": {
+        "rss_mib": 596.4,
+        "private_dirty_mib": 491.0
+      },
+      "cold_ready_s": 58.43,
+      "cold_to_first_tok_s": 58.5
+    },
+    "flint_fp8_mtp": {
+      "cold_ready_s": 2.26,
+      "cold_to_first_tok_s": 2.33,
+      "w1_128": {
+        "ttft_ms": 152.96,
+        "decode_tok_s": 103.4,
+        "itl_p50_ms": 0.02,
+        "itl_p99_ms": 21.19,
+        "gen_tokens": 256,
+        "text_head": " sharing across CPU cores and GPU streaming multiprocessors.\n\nCache-Aligned Lock-Free Data Structures: The Hidden Latency Killer\n\nIn systems programming, cache-aligned lock-free da"
+      },
+      "w7_greenfield": {
+        "ttft_ms": 44.14,
+        "decode_tok_s": 143.4,
+        "itl_p50_ms": 0.01,
+        "itl_p99_ms": 21.12,
+        "gen_tokens": 256,
+        "text_head": "template<typename T, size_t N>\nclass SPSCRingBuffer {\npublic:\n    SPSCRingBuffer();\n    bool push(const T& item);\n    bool pop(T& out);\n    size_t size() const;\n    bool empty() co"
+      },
+      "w7_code_edit": {
+        "ttft_ms": 1108.03,
+        "decode_tok_s": 325.7,
+        "itl_p50_ms": 0.01,
+        "itl_p99_ms": 22.36,
+        "gen_tokens": 256,
+        "text_head": "#include \"kv_cache.hpp\"\n\n#include <algorithm>\n\nnamespace flint {\n\nRadixKvManager::RadixKvManager(u32 total_blocks) {\n    if (total_blocks > 0) init(total_blocks);\n}\n\nvoid RadixKvMa"
+      },
+      "peak_vram_mib": 18776,
+      "host_mem": {
+        "rss_mib": 587.4,
+        "private_dirty_mib": 481.8
+      }
+    },
+    "flint_fp8_ngram": {
+      "cold_ready_s": 2.26,
+      "cold_to_first_tok_s": 2.31,
+      "w1_128": {
+        "ttft_ms": 289.88,
+        "decode_tok_s": 154.2,
+        "itl_p50_ms": 6.54,
+        "itl_p99_ms": 15.22,
+        "gen_tokens": 256,
+        "text_head": " sharing across CPU cores and GPU streaming multiprocessors.\n\nCache-Aligned Lock-Free Data Structures: The Hidden Latency Killer\n\nIn systems programming, cache-aligned lock-free da"
+      },
+      "w7_greenfield": {
+        "ttft_ms": 43.71,
+        "decode_tok_s": 163.5,
+        "itl_p50_ms": 6.43,
+        "itl_p99_ms": 15.28,
+        "gen_tokens": 256,
+        "text_head": "template<typename T, size_t N>\nclass SPSCRingBuffer {\npublic:\n    SPSCRingBuffer();\n    bool push(const T& item);\n    bool pop(T& out);\n    size_t size() const;\n    bool empty() co"
+      },
+      "w7_code_edit": {
+        "ttft_ms": 1127.06,
+        "decode_tok_s": 307.5,
+        "itl_p50_ms": 0.01,
+        "itl_p99_ms": 16.04,
+        "gen_tokens": 256,
+        "text_head": "#include \"kv_cache.hpp\"\n\n#include <algorithm>\n\nnamespace flint {\n\nRadixKvManager::RadixKvManager(u32 total_blocks) {\n    if (total_blocks > 0) init(total_blocks);\n}\n\nvoid RadixKvMa"
+      },
+      "peak_vram_mib": 18440,
+      "host_mem": {
+        "rss_mib": 586.6,
+        "private_dirty_mib": 481.4
+      }
+    }
+  },
+  "flint_direct": {
+    "nvfp4_w1": "model=inkling2-mini-nvfp4.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=128 gen=256 runs=5 | cold=2160.2ms ttft=60.46ms (p99=60.55ms) decode=135.2 tok/s (p99=135.2 itl_p50=7.38ms itl_p99=7.47ms) hbm=745.8 GB/s (41.6% peak) active_w=5.489 GB vram=19549 MiB rss=555 MiB",
+    "fp8_w1": "model=inkling2-mini-fp8.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=128 gen=256 runs=5 | cold=1962.0ms ttft=64.61ms (p99=64.65ms) decode=158.5 tok/s (p99=158.4 itl_p50=6.30ms itl_p99=6.38ms) hbm=596.3 GB/s (33.3% peak) active_w=3.738 GB vram=18245 MiB rss=555 MiB",
+    "fp8_w2": "model=inkling2-mini-fp8.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=4096 gen=256 runs=5 | cold=1989.2ms ttft=1138.45ms (p99=1139.70ms) decode=141.9 tok/s (p99=141.9 itl_p50=7.04ms itl_p99=7.07ms) hbm=552.8 GB/s (30.8% peak) active_w=3.738 GB vram=18245 MiB rss=595 MiB",
+    "fp8_w3": "model=inkling2-mini-fp8.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=16384 gen=256 runs=3 | cold=1976.6ms ttft=6324.07ms (p99=6350.47ms) decode=127.2 tok/s (p99=127.1 itl_p50=7.86ms itl_p99=7.88ms) hbm=522.0 GB/s (29.1% peak) active_w=3.738 GB vram=18443 MiB rss=595 MiB"
+  },
+  "llama_cpp_http": {
+    "w1_128": {
+      "ttft_ms": 143.72,
+      "decode_tok_s": 90.4,
+      "itl_p50_ms": 10.93,
+      "itl_p99_ms": 13.07,
+      "gen_tokens": 256,
+      "vram_mib": 19668
+    },
+    "w2_4096": {
+      "ttft_ms": 2047.98,
+      "decode_tok_s": 88.1,
+      "itl_p50_ms": 11.23,
+      "itl_p99_ms": 12.81,
+      "gen_tokens": 256,
+      "vram_mib": 19670
+    },
+    "w3_16384": {
+      "ttft_ms": 7208.86,
+      "decode_tok_s": 84.7,
+      "itl_p50_ms": 11.69,
+      "itl_p99_ms": 12.96,
+      "gen_tokens": 256,
+      "vram_mib": 19670
+    },
+    "w4_pp1024": {
+      "ttft_ms": 522.4,
+      "decode_tok_s": 1.9,
+      "itl_p50_ms": 0.0,
+      "itl_p99_ms": 0.0,
+      "gen_tokens": 1,
+      "vram_mib": 19670
+    },
+    "w4_pp4096": {
+      "ttft_ms": 1939.95,
+      "decode_tok_s": 0.5,
+      "itl_p50_ms": 0.0,
+      "itl_p99_ms": 0.0,
+      "gen_tokens": 1,
+      "vram_mib": 19670
+    },
+    "w5_prefix_cache": {
+      "cold_ttft_ms": 3429.06,
+      "hit_ttft_ms": 515.82
+    },
+    "w7_greenfield": {
+      "ttft_ms": 30.76,
+      "decode_tok_s": 90.3,
+      "itl_p50_ms": 10.94,
+      "itl_p99_ms": 13.29,
+      "gen_tokens": 256,
+      "vram_mib": 19670
+    },
+    "w7_code_edit": {
+      "ttft_ms": 124.05,
+      "decode_tok_s": 88.3,
+      "itl_p50_ms": 11.13,
+      "itl_p99_ms": 13.26,
+      "gen_tokens": 256,
+      "vram_mib": 19670
+    },
+    "peak_vram_mib": 19670,
+    "host_mem": {
+      "rss_mib": 8972.4,
+      "private_dirty_mib": 8371.7
+    },
+    "cold_ready_s": 26.72,
+    "cold_to_first_tok_s": 26.84
+  },
+  "llama_cpp_direct": "| model                          |       size |     params | backend    | ngl |  fa |            test |                  t/s |\n| ------------------------------ | ---------: | ---------: | ---------- | --: | --: | --------------: | -------------------: |\n| inkling2_loop ?B IQ4_NL - 4.5 bpw |  16.41 GiB |    26.07 B | CUDA       |  99 |   1 |           pp128 |      1912.44 \u00b1 85.94 |\n| inkling2_loop ?B IQ4_NL - 4.5 bpw |  16.41 GiB |    26.07 B | CUDA       |  99 |   1 |          pp1024 |      2721.28 \u00b1 22.33 |\n| inkling2_loop ?B IQ4_NL - 4.5 bpw |  16.41 GiB |    26.07 B | CUDA       |  99 |   1 |          pp4096 |       2332.37 \u00b1 0.74 |\n| inkling2_loop ?B IQ4_NL - 4.5 bpw |  16.41 GiB |    26.07 B | CUDA       |  99 |   1 |           tg256 |         92.97 \u00b1 0.31 |\n\nbuild: b052049 (1)",
+  "sglang_http": {
+    "sglang_base": {
+      "w1_128": {
+        "ttft_ms": 35.43,
+        "decode_tok_s": 161.2,
+        "itl_p50_ms": 6.21,
+        "itl_p99_ms": 6.45,
+        "gen_tokens": 256,
+        "vram_mib": 28316
+      },
+      "w2_4096": {
+        "ttft_ms": 262.67,
+        "decode_tok_s": 156.6,
+        "itl_p50_ms": 6.39,
+        "itl_p99_ms": 6.69,
+        "gen_tokens": 256,
+        "vram_mib": 28316
+      },
+      "w3_16384": {
+        "ttft_ms": 1033.96,
+        "decode_tok_s": 150.9,
+        "itl_p50_ms": 6.63,
+        "itl_p99_ms": 6.88,
+        "gen_tokens": 256,
+        "vram_mib": 28316
+      },
+      "w4_pp1024": {
+        "ttft_ms": 83.93,
+        "decode_tok_s": 11.9,
+        "itl_p50_ms": 0.0,
+        "itl_p99_ms": 0.0,
+        "gen_tokens": 1,
+        "vram_mib": 28316
+      },
+      "w4_pp4096": {
+        "ttft_ms": 255.8,
+        "decode_tok_s": 3.9,
+        "itl_p50_ms": 0.0,
+        "itl_p99_ms": 0.0,
+        "gen_tokens": 1,
+        "vram_mib": 28316
+      },
+      "w5_prefix_cache": {
+        "cold_ttft_ms": 444.36,
+        "hit_ttft_ms": 53.07
+      },
+      "w7_greenfield": {
+        "ttft_ms": 24.91,
+        "decode_tok_s": 161.6,
+        "itl_p50_ms": 6.19,
+        "itl_p99_ms": 6.41,
+        "gen_tokens": 256,
+        "vram_mib": 28316
+      },
+      "w7_code_edit": {
+        "ttft_ms": 37.65,
+        "decode_tok_s": 157.6,
+        "itl_p50_ms": 6.34,
+        "itl_p99_ms": 6.6,
+        "gen_tokens": 256,
+        "vram_mib": 28316
+      },
+      "peak_vram_mib": 28316,
+      "host_mem": {
+        "rss_mib": 7578.1,
+        "private_dirty_mib": 5845.5
+      },
+      "cold_ready_s": 103.24,
+      "cold_to_first_tok_s": 108.65
+    },
+    "sglang_dspark": {
+      "cold_ready_s": 176.26,
+      "cold_to_first_tok_s": 178.2,
+      "w1_128": {
+        "ttft_ms": 421.09,
+        "decode_tok_s": 286.7,
+        "itl_p50_ms": 11.72,
+        "itl_p99_ms": 12.42,
+        "gen_tokens": 256,
+        "text_head": " sharing across CPU cores and GPU streaming multiprocessors.\n\nCache-Aligned Lock-Free Data Structures\n\nIn systems programming, cache-aligned lock-free data structures minimize late"
+      },
+      "w7_greenfield": {
+        "ttft_ms": 31.34,
+        "decode_tok_s": 321.9,
+        "itl_p50_ms": 12.03,
+        "itl_p99_ms": 12.75,
+        "gen_tokens": 256,
+        "text_head": "#include <atomic>\n#include <cstddef>\n#include <optional>\n#include <vector>\n\ntemplate <typename T>\nclass RingBuffer {\npublic:\n    explicit RingBuffer(std::size_t capacity);\n    bool"
+      },
+      "w7_code_edit": {
+        "ttft_ms": 136.05,
+        "decode_tok_s": 592.2,
+        "itl_p50_ms": 12.71,
+        "itl_p99_ms": 13.4,
+        "gen_tokens": 256,
+        "text_head": "#include \"kv_cache.hpp\"\n\n#include <algorithm>\n\nnamespace flint {\n\nRadixKvManager::RadixKvManager(u32 total_blocks) {\n    if (total_blocks > 0) init(total_blocks);\n}\n\nvoid RadixKvMa"
+      },
+      "peak_vram_mib": 27672,
+      "host_mem": {
+        "rss_mib": 8221.7,
+        "private_dirty_mib": 6455.7
+      }
+    }
+  },
+  "vllm_http": {
+    "vllm_base": {
+      "cold_ready_s": 450.23,
+      "cold_to_first_tok_s": 450.58,
+      "w1_128": {
+        "ttft_ms": 59.8,
+        "decode_tok_s": 175.2,
+        "itl_p50_ms": 5.71,
+        "vram_mib": 26616
+      },
+      "w2_4096": {
+        "ttft_ms": 226.02,
+        "decode_tok_s": 170.4,
+        "itl_p50_ms": 5.87,
+        "vram_mib": 27266
+      },
+      "w3_16384": {
+        "ttft_ms": 752.67,
+        "decode_tok_s": 163.8,
+        "itl_p50_ms": 6.11,
+        "vram_mib": 27266
+      },
+      "w4_pp1024": {
+        "ttft_ms": 66.45,
+        "vram_mib": 27266
+      },
+      "w4_pp4096_cold_w2": {
+        "ttft_ms": 226.02,
+        "vram_mib": 27266
+      },
+      "w5_prefix_cache": {
+        "cold_ttft_ms": 3719.32,
+        "hit_ttft_ms": 823.01
+      },
+      "w7_greenfield": {
+        "ttft_ms": 59.47,
+        "decode_tok_s": 175.4,
+        "itl_p50_ms": 5.7,
+        "vram_mib": 27270
+      },
+      "w7_code_edit": {
+        "ttft_ms": 59.45,
+        "decode_tok_s": 171.7,
+        "itl_p50_ms": 5.82,
+        "vram_mib": 27270
+      },
+      "peak_vram_mib": 27270,
+      "host_mem": {
+        "rss_mib": 4577.1,
+        "private_dirty_mib": 3400.3
+      }
+    },
+    "vllm_dspark": {
+      "cold_ready_s": 194.82,
+      "cold_to_first_tok_s": 194.99,
+      "w1_128": {
+        "ttft_ms": 2612.55,
+        "decode_tok_s": 210.0,
+        "itl_p50_ms": 10.6,
+        "itl_p99_ms": 11.29,
+        "gen_tokens": 256,
+        "text_head": " sharing across CPU cores and GPU streaming multiprocessors.\n\nCache-aligned lock-free data structures are a cornerstone of modern systems programming, enabling high-throughput, low"
+      },
+      "w7_greenfield": {
+        "ttft_ms": 1794.19,
+        "decode_tok_s": 344.5,
+        "itl_p50_ms": 10.78,
+        "itl_p99_ms": 11.42,
+        "gen_tokens": 256,
+        "text_head": "#include <atomic>\n#include <cstddef>\n#include <cstdint>\n#include <optional>\n#include <vector>\n\ntemplate <typename T>\nclass SPSCRingBuffer {\npublic:\n    explicit SPSCRingBuffer(std:"
+      },
+      "w7_code_edit": {
+        "ttft_ms": 132.7,
+        "decode_tok_s": 657.4,
+        "itl_p50_ms": 11.35,
+        "itl_p99_ms": 11.93,
+        "gen_tokens": 256,
+        "text_head": "#include \"kv_cache.hpp\"\n\n#include <algorithm>\n\nnamespace flint {\n\nRadixKvManager::RadixKvManager(u32 total_blocks) {\n    if (total_blocks > 0) init(total_blocks);\n}\n\nvoid RadixKvMa"
+      },
+      "peak_vram_mib": 27202,
+      "host_mem": {
+        "rss_mib": 5224.6,
+        "private_dirty_mib": 3933.7
+      }
+    }
+  }
+}

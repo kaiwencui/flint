@@ -1,0 +1,846 @@
+{
+  "gpu": "NVIDIA GeForce RTX 4090, 24564 MiB, 595.112.07",
+  "methodology": "2 warmup + 7 timed runs (p50 median), greedy, ignore_eos=true",
+  "w1": {
+    "flint_bf16": {
+      "raw": "model=qwen7b-bf16.pack backend=NVIDIA GeForce RTX 4090 quant=bf16 seq=128 gen=256 runs=7 | cold=8843.2ms ttft=20.39ms (p99=20.57ms) decode=64.2 tok/s (p99=64.2 itl_p50=15.57ms itl_p99=15.64ms) hbm=908.5 GB/s (90.1% peak) active_w=14.141 GB vram=15619 MiB rss=431 MiB",
+      "cold_ms": 8843.2,
+      "ttft_ms": 20.39,
+      "decode_tok_s": 64.2,
+      "itl_p50_ms": 15.57,
+      "itl_p99_ms": 15.64,
+      "hbm_gbs": 908.5,
+      "active_weight_gb": 14.141,
+      "vram_mib": 15619,
+      "rss_mib": 431
+    },
+    "flint_fp8": {
+      "raw": "model=qwen7b-fp8.pack backend=NVIDIA GeForce RTX 4090 quant=fp8 seq=128 gen=256 runs=7 | cold=5098.4ms ttft=12.77ms (p99=13.00ms) decode=121.8 tok/s (p99=121.8 itl_p50=8.21ms itl_p99=8.27ms) hbm=863.7 GB/s (85.7% peak) active_w=7.077 GB vram=9357 MiB rss=250 MiB",
+      "cold_ms": 5098.4,
+      "ttft_ms": 12.77,
+      "decode_tok_s": 121.8,
+      "itl_p50_ms": 8.21,
+      "itl_p99_ms": 8.27,
+      "hbm_gbs": 863.7,
+      "active_weight_gb": 7.077,
+      "vram_mib": 9357,
+      "rss_mib": 250
+    },
+    "flint_w4a16": {
+      "raw": "model=qwen7b-w4a16.pack backend=NVIDIA GeForce RTX 4090 quant=w4a16 seq=128 gen=256 runs=7 | cold=3155.9ms ttft=35.72ms (p99=35.85ms) decode=198.9 tok/s (p99=198.8 itl_p50=5.02ms itl_p99=5.08ms) hbm=801.0 GB/s (79.5% peak) active_w=4.013 GB vram=6221 MiB rss=431 MiB",
+      "cold_ms": 3155.9,
+      "ttft_ms": 35.72,
+      "decode_tok_s": 198.9,
+      "itl_p50_ms": 5.02,
+      "itl_p99_ms": 5.08,
+      "hbm_gbs": 801.0,
+      "active_weight_gb": 4.013,
+      "vram_mib": 6221,
+      "rss_mib": 431
+    },
+    "llama_bf16": {
+      "pp_tok_s": 4408.91155,
+      "ttft_ms": 29.032108843281286,
+      "tg_tok_s": 64.312271
+    },
+    "llama_q4_0": {
+      "pp_tok_s": 6300.311863,
+      "ttft_ms": 20.316454611034228,
+      "tg_tok_s": 190.969556
+    },
+    "llama_q4_k_m": {
+      "pp_tok_s": 6336.236207,
+      "ttft_ms": 20.201267095849605,
+      "tg_tok_s": 180.512893
+    }
+  },
+  "w2": {
+    "flint_bf16": {
+      "raw": "model=qwen7b-bf16.pack backend=NVIDIA GeForce RTX 4090 quant=bf16 seq=4096 gen=256 runs=7 | cold=9915.1ms ttft=498.18ms (p99=498.42ms) decode=60.8 tok/s (p99=60.8 itl_p50=16.44ms itl_p99=16.46ms) hbm=874.6 GB/s (86.8% peak) active_w=14.141 GB vram=15619 MiB rss=430 MiB",
+      "cold_ms": 9915.1,
+      "ttft_ms": 498.18,
+      "decode_tok_s": 60.8,
+      "itl_p50_ms": 16.44,
+      "itl_p99_ms": 16.46,
+      "hbm_gbs": 874.6,
+      "active_weight_gb": 14.141,
+      "vram_mib": 15619,
+      "rss_mib": 430
+    },
+    "flint_fp8": {
+      "raw": "model=qwen7b-fp8.pack backend=NVIDIA GeForce RTX 4090 quant=fp8 seq=4096 gen=256 runs=7 | cold=5062.5ms ttft=378.36ms (p99=379.01ms) decode=110.5 tok/s (p99=110.4 itl_p50=9.05ms itl_p99=9.07ms) hbm=808.5 GB/s (80.2% peak) active_w=7.077 GB vram=9357 MiB rss=250 MiB",
+      "cold_ms": 5062.5,
+      "ttft_ms": 378.36,
+      "decode_tok_s": 110.5,
+      "itl_p50_ms": 9.05,
+      "itl_p99_ms": 9.07,
+      "hbm_gbs": 808.5,
+      "active_weight_gb": 7.077,
+      "vram_mib": 9357,
+      "rss_mib": 250
+    },
+    "flint_w4a16": {
+      "raw": "model=qwen7b-w4a16.pack backend=NVIDIA GeForce RTX 4090 quant=w4a16 seq=4096 gen=256 runs=7 | cold=3587.3ms ttft=531.47ms (p99=531.68ms) decode=170.2 tok/s (p99=170.2 itl_p50=5.87ms itl_p99=5.89ms) hbm=724.4 GB/s (71.9% peak) active_w=4.013 GB vram=6221 MiB rss=430 MiB",
+      "cold_ms": 3587.3,
+      "ttft_ms": 531.47,
+      "decode_tok_s": 170.2,
+      "itl_p50_ms": 5.87,
+      "itl_p99_ms": 5.89,
+      "hbm_gbs": 724.4,
+      "active_weight_gb": 4.013,
+      "vram_mib": 6221,
+      "rss_mib": 430
+    },
+    "flint_bf16_fp8kv": {
+      "raw": "model=qwen7b-bf16.pack backend=NVIDIA GeForce RTX 4090 quant=bf16 seq=4096 gen=256 runs=7 | cold=10055.3ms ttft=507.87ms (p99=508.54ms) decode=60.8 tok/s (p99=60.8 itl_p50=16.45ms itl_p99=16.47ms) hbm=867.1 GB/s (86.0% peak) active_w=14.141 GB vram=15511 MiB rss=430 MiB",
+      "cold_ms": 10055.3,
+      "ttft_ms": 507.87,
+      "decode_tok_s": 60.8,
+      "itl_p50_ms": 16.45,
+      "itl_p99_ms": 16.47,
+      "hbm_gbs": 867.1,
+      "active_weight_gb": 14.141,
+      "vram_mib": 15511,
+      "rss_mib": 430
+    },
+    "flint_w4a16_fp8kv": {
+      "raw": "model=qwen7b-w4a16.pack backend=NVIDIA GeForce RTX 4090 quant=w4a16 seq=4096 gen=256 runs=7 | cold=2222.4ms ttft=540.42ms (p99=540.83ms) decode=170.2 tok/s (p99=170.1 itl_p50=5.88ms itl_p99=5.89ms) hbm=704.1 GB/s (69.8% peak) active_w=4.013 GB vram=6113 MiB rss=430 MiB",
+      "cold_ms": 2222.4,
+      "ttft_ms": 540.42,
+      "decode_tok_s": 170.2,
+      "itl_p50_ms": 5.88,
+      "itl_p99_ms": 5.89,
+      "hbm_gbs": 704.1,
+      "active_weight_gb": 4.013,
+      "vram_mib": 6113,
+      "rss_mib": 430
+    },
+    "llama_bf16": {
+      "tg_tok_s": 62.593005
+    },
+    "llama_q4_0": {
+      "tg_tok_s": 176.885739
+    },
+    "llama_q4_k_m": {
+      "tg_tok_s": 168.031858
+    }
+  },
+  "w3": {
+    "flint_bf16": {
+      "raw": "model=qwen7b-bf16.pack backend=NVIDIA GeForce RTX 4090 quant=bf16 seq=16384 gen=256 runs=5 | cold=3216.3ms ttft=3892.51ms (p99=3894.85ms) decode=57.6 tok/s (p99=57.6 itl_p50=17.37ms itl_p99=17.38ms) hbm=868.6 GB/s (86.2% peak) active_w=14.141 GB vram=16291 MiB rss=430 MiB",
+      "cold_ms": 3216.3,
+      "ttft_ms": 3892.51,
+      "decode_tok_s": 57.6,
+      "itl_p50_ms": 17.37,
+      "itl_p99_ms": 17.38,
+      "hbm_gbs": 868.6,
+      "active_weight_gb": 14.141,
+      "vram_mib": 16291,
+      "rss_mib": 430
+    },
+    "flint_fp8": {
+      "raw": "model=qwen7b-fp8.pack backend=NVIDIA GeForce RTX 4090 quant=fp8 seq=16384 gen=256 runs=5 | cold=5745.3ms ttft=3402.59ms (p99=3404.53ms) decode=100.2 tok/s (p99=100.2 itl_p50=9.98ms itl_p99=9.99ms) hbm=804.2 GB/s (79.8% peak) active_w=7.077 GB vram=10029 MiB rss=250 MiB",
+      "cold_ms": 5745.3,
+      "ttft_ms": 3402.59,
+      "decode_tok_s": 100.2,
+      "itl_p50_ms": 9.98,
+      "itl_p99_ms": 9.99,
+      "hbm_gbs": 804.2,
+      "active_weight_gb": 7.077,
+      "vram_mib": 10029,
+      "rss_mib": 250
+    },
+    "flint_w4a16": {
+      "raw": "model=qwen7b-w4a16.pack backend=NVIDIA GeForce RTX 4090 quant=w4a16 seq=16384 gen=256 runs=5 | cold=3610.4ms ttft=4015.30ms (p99=4016.97ms) decode=147.3 tok/s (p99=147.3 itl_p50=6.79ms itl_p99=6.80ms) hbm=730.6 GB/s (72.5% peak) active_w=4.013 GB vram=6893 MiB rss=430 MiB",
+      "cold_ms": 3610.4,
+      "ttft_ms": 4015.3,
+      "decode_tok_s": 147.3,
+      "itl_p50_ms": 6.79,
+      "itl_p99_ms": 6.8,
+      "hbm_gbs": 730.6,
+      "active_weight_gb": 4.013,
+      "vram_mib": 6893,
+      "rss_mib": 430
+    },
+    "flint_bf16_fp8kv": {
+      "raw": "model=qwen7b-bf16.pack backend=NVIDIA GeForce RTX 4090 quant=bf16 seq=16384 gen=256 runs=5 | cold=7049.9ms ttft=4044.79ms (p99=4048.19ms) decode=57.6 tok/s (p99=57.6 itl_p50=17.37ms itl_p99=17.38ms) hbm=842.2 GB/s (83.5% peak) active_w=14.141 GB vram=15859 MiB rss=430 MiB",
+      "cold_ms": 7049.9,
+      "ttft_ms": 4044.79,
+      "decode_tok_s": 57.6,
+      "itl_p50_ms": 17.37,
+      "itl_p99_ms": 17.38,
+      "hbm_gbs": 842.2,
+      "active_weight_gb": 14.141,
+      "vram_mib": 15859,
+      "rss_mib": 430
+    },
+    "flint_w4a16_fp8kv": {
+      "raw": "model=qwen7b-w4a16.pack backend=NVIDIA GeForce RTX 4090 quant=w4a16 seq=16384 gen=256 runs=5 | cold=2287.5ms ttft=4179.15ms (p99=4182.15ms) decode=147.0 tok/s (p99=147.0 itl_p50=6.80ms itl_p99=6.81ms) hbm=661.7 GB/s (65.6% peak) active_w=4.013 GB vram=6461 MiB rss=431 MiB",
+      "cold_ms": 2287.5,
+      "ttft_ms": 4179.15,
+      "decode_tok_s": 147.0,
+      "itl_p50_ms": 6.8,
+      "itl_p99_ms": 6.81,
+      "hbm_gbs": 661.7,
+      "active_weight_gb": 4.013,
+      "vram_mib": 6461,
+      "rss_mib": 431
+    },
+    "llama_bf16": {
+      "tg_tok_s": 59.487087
+    },
+    "llama_q4_0": {
+      "tg_tok_s": 154.694708
+    },
+    "llama_q4_k_m": {
+      "tg_tok_s": 148.180575
+    }
+  },
+  "w4": {
+    "flint_bf16_1024": {
+      "raw": "model=qwen7b-bf16.pack backend=NVIDIA GeForce RTX 4090 quant=bf16 seq=1024 gen=1 runs=7 | cold=3351.4ms ttft=98.01ms (p99=98.11ms) decode=0.0 tok/s (p99=0.0 itl_p50=0.00ms itl_p99=0.00ms) hbm=0.0 GB/s (0.0% peak) active_w=14.141 GB vram=15619 MiB rss=428 MiB",
+      "cold_ms": 3351.4,
+      "ttft_ms": 98.01,
+      "decode_tok_s": 0.0,
+      "itl_p50_ms": 0.0,
+      "itl_p99_ms": 0.0,
+      "hbm_gbs": 0.0,
+      "active_weight_gb": 14.141,
+      "vram_mib": 15619,
+      "rss_mib": 428
+    },
+    "flint_w4a16_1024": {
+      "raw": "model=qwen7b-w4a16.pack backend=NVIDIA GeForce RTX 4090 quant=w4a16 seq=1024 gen=1 runs=7 | cold=3101.9ms ttft=113.30ms (p99=113.31ms) decode=0.0 tok/s (p99=0.0 itl_p50=0.00ms itl_p99=0.00ms) hbm=0.0 GB/s (0.0% peak) active_w=4.013 GB vram=6221 MiB rss=429 MiB",
+      "cold_ms": 3101.9,
+      "ttft_ms": 113.3,
+      "decode_tok_s": 0.0,
+      "itl_p50_ms": 0.0,
+      "itl_p99_ms": 0.0,
+      "hbm_gbs": 0.0,
+      "active_weight_gb": 4.013,
+      "vram_mib": 6221,
+      "rss_mib": 429
+    },
+    "llama_bf16_1024": {
+      "pp_tok_s": 9274.301917,
+      "ttft_ms": 110.4126228760124
+    },
+    "llama_q4_k_m_1024": {
+      "pp_tok_s": 11754.546076,
+      "ttft_ms": 87.11523127981654
+    },
+    "flint_bf16_4096": {
+      "raw": "model=qwen7b-bf16.pack backend=NVIDIA GeForce RTX 4090 quant=bf16 seq=4096 gen=1 runs=7 | cold=3995.4ms ttft=499.36ms (p99=499.85ms) decode=0.0 tok/s (p99=0.0 itl_p50=0.00ms itl_p99=0.00ms) hbm=0.0 GB/s (0.0% peak) active_w=14.141 GB vram=15619 MiB rss=428 MiB",
+      "cold_ms": 3995.4,
+      "ttft_ms": 499.36,
+      "decode_tok_s": 0.0,
+      "itl_p50_ms": 0.0,
+      "itl_p99_ms": 0.0,
+      "hbm_gbs": 0.0,
+      "active_weight_gb": 14.141,
+      "vram_mib": 15619,
+      "rss_mib": 428
+    },
+    "flint_w4a16_4096": {
+      "raw": "model=qwen7b-w4a16.pack backend=NVIDIA GeForce RTX 4090 quant=w4a16 seq=4096 gen=1 runs=7 | cold=1387.0ms ttft=531.63ms (p99=532.07ms) decode=0.0 tok/s (p99=0.0 itl_p50=0.00ms itl_p99=0.00ms) hbm=0.0 GB/s (0.0% peak) active_w=4.013 GB vram=6221 MiB rss=429 MiB",
+      "cold_ms": 1387.0,
+      "ttft_ms": 531.63,
+      "decode_tok_s": 0.0,
+      "itl_p50_ms": 0.0,
+      "itl_p99_ms": 0.0,
+      "hbm_gbs": 0.0,
+      "active_weight_gb": 4.013,
+      "vram_mib": 6221,
+      "rss_mib": 429
+    },
+    "llama_bf16_4096": {
+      "pp_tok_s": 8221.691298,
+      "ttft_ms": 498.1943314992122
+    },
+    "llama_q4_k_m_4096": {
+      "pp_tok_s": 10061.507479,
+      "ttft_ms": 407.09605479586605
+    }
+  },
+  "w5": {
+    "flint_unix_cold": {
+      "text": "int binary_search(uint32_t* arr, uint32_t n, uint32_t target) {\n    int left = 0, right = n - 1;\n    while (left <= right) {\n        int mid = left + (right - left) / 2;\n        if (arr",
+      "prompt_tokens": 7191,
+      "prefix_cached_tokens": 0,
+      "generated_tokens": 64,
+      "ttft_ms": 1429.5,
+      "decode_tok_s": 161.593,
+      "achieved_hbm_gbs": 715.374,
+      "pct_hbm_peak": 70.9629
+    },
+    "flint_unix_hit": {
+      "text": "// https://lemire.me/blog/2020/09/28/fast-prefix-sums-using-simd/\n// https://lemire.me/blog/2020/09/28/fast-prefix-sums-using-simd-part-2/\n// https://lemire.me/blog/2",
+      "prompt_tokens": 7196,
+      "prefix_cached_tokens": 7168,
+      "generated_tokens": 64,
+      "ttft_ms": 46.2695,
+      "decode_tok_s": 163.942,
+      "achieved_hbm_gbs": 725.818,
+      "pct_hbm_peak": 71.9989,
+      "ttft_ms_p50": 46.4
+    },
+    "flint_serve_rss_mib": 431.4,
+    "flint_serve_pd_mib": 322.2
+  },
+  "w6": {
+    "flint w4a16.pack": {
+      "p50_s": 1.508,
+      "p99_s": 1.519
+    },
+    "llama-cli q4_k_m": {
+      "p50_s": 2.728,
+      "p99_s": 2.945
+    }
+  },
+  "w7": {
+    "edit_spec_none": {
+      "decode_tok_s": 184.732,
+      "stats_line": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=w4a16 cold_start=1185.6ms ttft=391.83ms prompt=1438 (cached=0) gen=256 decode=184.7 tok/s (itl p50=5.39ms p99=5.46ms) hbm=757.9 GB/s (75.2% peak) vram=6445/24082 MiB rss=430 MiB"
+    },
+    "edit_spec_ngram": {
+      "decode_tok_s": 361.128,
+      "stats_line": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=w4a16 cold_start=1227.7ms ttft=397.35ms prompt=1438 (cached=0) gen=256 decode=361.1 tok/s (itl p50=1.32ms p99=7.78ms) hbm=633.3 GB/s (62.8% peak) vram=6445/24082 MiB rss=428 MiB spec_accept=67.0% (146/218)"
+    },
+    "edit_spec_draft": {
+      "decode_tok_s": 366.722,
+      "stats_line": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=w4a16 cold_start=1933.8ms ttft=403.79ms prompt=1438 (cached=0) gen=256 decode=366.7 tok/s (itl p50=1.53ms p99=9.37ms) hbm=407.1 GB/s (40.4% peak) vram=7203/24082 MiB rss=466 MiB spec_accept=68.6% (186/271)"
+    },
+    "edit_lossless_ngram": true,
+    "edit_lossless_draft": true,
+    "greenfield_spec_none": {
+      "decode_tok_s": 200.134,
+      "stats_line": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=w4a16 cold_start=1366.1ms ttft=294.32ms prompt=48 (cached=0) gen=256 decode=200.1 tok/s (itl p50=4.98ms p99=5.05ms) hbm=805.1 GB/s (79.9% peak) vram=6445/24082 MiB rss=440 MiB"
+    },
+    "greenfield_spec_draft": {
+      "decode_tok_s": 280.497,
+      "stats_line": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=w4a16 cold_start=1490.3ms ttft=275.46ms prompt=48 (cached=0) gen=256 decode=280.5 tok/s (itl p50=3.08ms p99=9.89ms) hbm=473.5 GB/s (47.0% peak) vram=7203/24082 MiB rss=467 MiB spec_accept=56.9% (148/260)"
+    },
+    "greenfield_draft_lossless": true
+  },
+  "http_servers": {
+    "flint_bf16": {
+      "status": "ok",
+      "w6_cold_start_s": 6.82,
+      "w1": {
+        "ttft_ms": 23.21,
+        "decode_tok_s": 64.04,
+        "itl_p50_ms": 15.62,
+        "itl_p99_ms": 15.76,
+        "chunks": 256
+      },
+      "w2": {
+        "ttft_ms": 539.5,
+        "decode_tok_s": 60.74,
+        "itl_p50_ms": 16.46,
+        "itl_p99_ms": 16.59,
+        "chunks": 256
+      },
+      "w3": {
+        "ttft_ms": 3963.34,
+        "decode_tok_s": 57.52,
+        "itl_p50_ms": 17.39,
+        "itl_p99_ms": 17.5,
+        "chunks": 256
+      },
+      "w4": {
+        "pp1024": {
+          "ttft_ms": 110.83,
+          "pp_tok_s": 9239.4
+        },
+        "pp4096": {
+          "ttft_ms": 540.06,
+          "pp_tok_s": 7584.3
+        }
+      },
+      "w5": {
+        "cold": {
+          "ttft_ms": 1135.94,
+          "decode_tok_s": 59.89,
+          "itl_p50_ms": 16.69,
+          "itl_p99_ms": 16.88,
+          "chunks": 64
+        },
+        "hit": {
+          "ttft_ms": 41.77,
+          "decode_tok_s": 59.83,
+          "itl_p50_ms": 16.71,
+          "itl_p99_ms": 16.82,
+          "chunks": 64,
+          "ttft_ms_p50": 41.73
+        }
+      },
+      "footprint": {
+        "rss_mib": 440.8,
+        "private_dirty_mib": 328.2,
+        "vram_mib": 16292
+      }
+    },
+    "flint_fp8": {
+      "status": "ok",
+      "w6_cold_start_s": 6.065,
+      "w1": {
+        "ttft_ms": 14.82,
+        "decode_tok_s": 121.34,
+        "itl_p50_ms": 8.24,
+        "itl_p99_ms": 8.34,
+        "chunks": 256
+      },
+      "w2": {
+        "ttft_ms": 403.9,
+        "decode_tok_s": 110.11,
+        "itl_p50_ms": 9.08,
+        "itl_p99_ms": 9.17,
+        "chunks": 256
+      },
+      "w3": {
+        "ttft_ms": 3452.79,
+        "decode_tok_s": 100.04,
+        "itl_p50_ms": 10.0,
+        "itl_p99_ms": 10.06,
+        "chunks": 256
+      },
+      "w4": {
+        "pp1024": {
+          "ttft_ms": 77.07,
+          "pp_tok_s": 13286.6
+        },
+        "pp4096": {
+          "ttft_ms": 403.52,
+          "pp_tok_s": 10150.7
+        }
+      },
+      "w5": {
+        "cold": {
+          "ttft_ms": 911.27,
+          "decode_tok_s": 107.43,
+          "itl_p50_ms": 9.31,
+          "itl_p99_ms": 9.42,
+          "chunks": 64
+        },
+        "hit": {
+          "ttft_ms": 34.05,
+          "decode_tok_s": 107.42,
+          "itl_p50_ms": 9.31,
+          "itl_p99_ms": 9.4,
+          "chunks": 64,
+          "ttft_ms_p50": 34.16
+        }
+      },
+      "footprint": {
+        "rss_mib": 251.6,
+        "private_dirty_mib": 143.2,
+        "vram_mib": 10030
+      }
+    },
+    "flint_w4a16": {
+      "status": "ok",
+      "w6_cold_start_s": 2.842,
+      "w1": {
+        "ttft_ms": 38.3,
+        "decode_tok_s": 197.72,
+        "itl_p50_ms": 5.05,
+        "itl_p99_ms": 5.23,
+        "chunks": 256
+      },
+      "w2": {
+        "ttft_ms": 575.28,
+        "decode_tok_s": 169.64,
+        "itl_p50_ms": 5.89,
+        "itl_p99_ms": 5.96,
+        "chunks": 256
+      },
+      "w3": {
+        "ttft_ms": 4103.68,
+        "decode_tok_s": 146.75,
+        "itl_p50_ms": 6.81,
+        "itl_p99_ms": 6.91,
+        "chunks": 256
+      },
+      "w4": {
+        "pp1024": {
+          "ttft_ms": 125.51,
+          "pp_tok_s": 8158.7
+        },
+        "pp4096": {
+          "ttft_ms": 576.15,
+          "pp_tok_s": 7109.3
+        }
+      },
+      "w5": {
+        "cold": {
+          "ttft_ms": 1198.68,
+          "decode_tok_s": 163.19,
+          "itl_p50_ms": 6.12,
+          "itl_p99_ms": 6.3,
+          "chunks": 64
+        },
+        "hit": {
+          "ttft_ms": 50.15,
+          "decode_tok_s": 163.4,
+          "itl_p50_ms": 6.12,
+          "itl_p99_ms": 6.24,
+          "chunks": 64,
+          "ttft_ms_p50": 49.5
+        }
+      },
+      "footprint": {
+        "rss_mib": 441.4,
+        "private_dirty_mib": 328.8,
+        "vram_mib": 6894
+      }
+    },
+    "vllm_bf16": {
+      "status": "ok",
+      "w6_cold_start_s": 116.29,
+      "w1": {
+        "ttft_ms": 42.18,
+        "decode_tok_s": 63.49,
+        "itl_p50_ms": 15.76,
+        "itl_p99_ms": 16.26,
+        "chunks": 256
+      },
+      "w2": {
+        "ttft_ms": 435.75,
+        "decode_tok_s": 62.54,
+        "itl_p50_ms": 16.01,
+        "itl_p99_ms": 16.47,
+        "chunks": 256
+      },
+      "w3": {
+        "ttft_ms": 1911.29,
+        "decode_tok_s": 59.92,
+        "itl_p50_ms": 16.76,
+        "itl_p99_ms": 17.33,
+        "chunks": 256
+      },
+      "w4": {
+        "pp1024": {
+          "ttft_ms": 119.5,
+          "pp_tok_s": 8569.0
+        },
+        "pp4096": {
+          "ttft_ms": 433.99,
+          "pp_tok_s": 9438.0
+        }
+      },
+      "w5": {
+        "cold": {
+          "ttft_ms": 756.27,
+          "decode_tok_s": 62.39,
+          "itl_p50_ms": 16.15,
+          "itl_p99_ms": 16.32,
+          "chunks": 64
+        },
+        "hit": {
+          "ttft_ms": 84.33,
+          "decode_tok_s": 62.51,
+          "itl_p50_ms": 16.16,
+          "itl_p99_ms": 16.53,
+          "chunks": 64,
+          "ttft_ms_p50": 82.76
+        }
+      },
+      "footprint": {
+        "rss_mib": 3784.2,
+        "private_dirty_mib": 2849.9,
+        "vram_mib": 21500
+      }
+    },
+    "vllm_fp8": {
+      "status": "ok",
+      "w6_cold_start_s": 104.216,
+      "w1": {
+        "ttft_ms": 47.1,
+        "decode_tok_s": 90.71,
+        "itl_p50_ms": 11.03,
+        "itl_p99_ms": 11.31,
+        "chunks": 256
+      },
+      "w2": {
+        "ttft_ms": 319.56,
+        "decode_tok_s": 88.93,
+        "itl_p50_ms": 11.26,
+        "itl_p99_ms": 11.66,
+        "chunks": 256
+      },
+      "w3": {
+        "ttft_ms": 1399.79,
+        "decode_tok_s": 83.67,
+        "itl_p50_ms": 12.02,
+        "itl_p99_ms": 12.42,
+        "chunks": 256
+      },
+      "w4": {
+        "pp1024": {
+          "ttft_ms": 84.84,
+          "pp_tok_s": 12069.8
+        },
+        "pp4096": {
+          "ttft_ms": 303.03,
+          "pp_tok_s": 13516.8
+        }
+      },
+      "w5": {
+        "cold": {
+          "ttft_ms": 535.67,
+          "decode_tok_s": 88.47,
+          "itl_p50_ms": 11.43,
+          "itl_p99_ms": 11.66,
+          "chunks": 64
+        },
+        "hit": {
+          "ttft_ms": 84.73,
+          "decode_tok_s": 89.02,
+          "itl_p50_ms": 11.4,
+          "itl_p99_ms": 11.63,
+          "chunks": 64,
+          "ttft_ms_p50": 85.52
+        }
+      },
+      "footprint": {
+        "rss_mib": 4091.8,
+        "private_dirty_mib": 3088.9,
+        "vram_mib": 21450
+      }
+    },
+    "sglang_bf16": {
+      "status": "ok",
+      "w6_cold_start_s": 116.839,
+      "w1": {
+        "ttft_ms": 33.68,
+        "decode_tok_s": 65.08,
+        "itl_p50_ms": 15.36,
+        "itl_p99_ms": 16.68,
+        "chunks": 256
+      },
+      "w2": {
+        "ttft_ms": 452.67,
+        "decode_tok_s": 62.64,
+        "itl_p50_ms": 15.97,
+        "itl_p99_ms": 16.49,
+        "chunks": 256
+      },
+      "w3": {
+        "ttft_ms": 2148.07,
+        "decode_tok_s": 56.66,
+        "itl_p50_ms": 17.66,
+        "itl_p99_ms": 18.01,
+        "chunks": 256
+      },
+      "w4": {
+        "pp1024": {
+          "ttft_ms": 130.3,
+          "pp_tok_s": 7858.8
+        },
+        "pp4096": {
+          "ttft_ms": 439.53,
+          "pp_tok_s": 9319.0
+        }
+      },
+      "w5": {
+        "cold": {
+          "ttft_ms": 800.98,
+          "decode_tok_s": 61.16,
+          "itl_p50_ms": 16.37,
+          "itl_p99_ms": 17.15,
+          "chunks": 64
+        },
+        "hit": {
+          "ttft_ms": 57.2,
+          "decode_tok_s": 61.06,
+          "itl_p50_ms": 16.41,
+          "itl_p99_ms": 17.04,
+          "chunks": 64,
+          "ttft_ms_p50": 59.6
+        }
+      },
+      "footprint": {
+        "rss_mib": 5111.0,
+        "private_dirty_mib": 3658.7,
+        "vram_mib": 21768
+      }
+    },
+    "sglang_fp8": {
+      "status": "ok",
+      "w6_cold_start_s": 63.784,
+      "w1": {
+        "ttft_ms": 29.2,
+        "decode_tok_s": 112.08,
+        "itl_p50_ms": 8.92,
+        "itl_p99_ms": 9.53,
+        "chunks": 256
+      },
+      "w2": {
+        "ttft_ms": 281.2,
+        "decode_tok_s": 104.79,
+        "itl_p50_ms": 9.56,
+        "itl_p99_ms": 12.44,
+        "chunks": 256
+      },
+      "w3": {
+        "ttft_ms": 1579.42,
+        "decode_tok_s": 87.69,
+        "itl_p50_ms": 11.42,
+        "itl_p99_ms": 12.5,
+        "chunks": 256
+      },
+      "w4": {
+        "pp1024": {
+          "ttft_ms": 84.39,
+          "pp_tok_s": 12134.1
+        },
+        "pp4096": {
+          "ttft_ms": 284.2,
+          "pp_tok_s": 14412.4
+        }
+      },
+      "w5": {
+        "cold": {
+          "ttft_ms": 533.47,
+          "decode_tok_s": 100.15,
+          "itl_p50_ms": 10.01,
+          "itl_p99_ms": 10.79,
+          "chunks": 64
+        },
+        "hit": {
+          "ttft_ms": 64.69,
+          "decode_tok_s": 100.19,
+          "itl_p50_ms": 10.01,
+          "itl_p99_ms": 10.62,
+          "chunks": 64,
+          "ttft_ms_p50": 64.69
+        }
+      },
+      "footprint": {
+        "rss_mib": 5104.9,
+        "private_dirty_mib": 3635.1,
+        "vram_mib": 21938
+      }
+    }
+  },
+  "track2_inkling2_mini": {
+    "model": "thinkingmachines/Inkling-2-Mini",
+    "w1": {
+      "flint_nvfp4_bf16kv": {
+        "raw": "model=inkling2-mini-nvfp4.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=128 gen=256 runs=7 | cold=12556.9ms ttft=188.60ms (p99=188.85ms) decode=73.1 tok/s (p99=73.1 itl_p50=13.67ms itl_p99=14.64ms) hbm=404.9 GB/s (40.2% peak) active_w=5.489 GB vram=19543 MiB rss=475 MiB",
+        "cold_ms": 12556.9,
+        "ttft_ms": 188.6,
+        "decode_tok_s": 73.1,
+        "itl_p50_ms": 13.67,
+        "itl_p99_ms": 14.64,
+        "hbm_gbs": 404.9,
+        "active_weight_gb": 5.489,
+        "vram_mib": 19543,
+        "rss_mib": 475
+      },
+      "flint_nvfp4_int8kv": {
+        "raw": "model=inkling2-mini-nvfp4.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=128 gen=256 runs=7 | cold=14131.0ms ttft=189.51ms (p99=189.78ms) decode=73.1 tok/s (p99=73.0 itl_p50=13.68ms itl_p99=14.65ms) hbm=402.9 GB/s (40.0% peak) active_w=5.489 GB vram=19403 MiB rss=475 MiB",
+        "cold_ms": 14131.0,
+        "ttft_ms": 189.51,
+        "decode_tok_s": 73.1,
+        "itl_p50_ms": 13.68,
+        "itl_p99_ms": 14.65,
+        "hbm_gbs": 402.9,
+        "active_weight_gb": 5.489,
+        "vram_mib": 19403,
+        "rss_mib": 475
+      },
+      "llama_iq4_nl": {
+        "pp_tok_s": 1831.509577,
+        "ttft_ms": 69.88770444196263,
+        "tg_tok_s": 73.637823
+      }
+    },
+    "w2": {
+      "flint_nvfp4_int8kv": {
+        "raw": "model=inkling2-mini-nvfp4.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=4096 gen=256 runs=5 | cold=10808.4ms ttft=6459.19ms (p99=6473.79ms) decode=44.8 tok/s (p99=44.8 itl_p50=22.32ms itl_p99=22.59ms) hbm=252.8 GB/s (25.1% peak) active_w=5.489 GB vram=19403 MiB rss=474 MiB",
+        "cold_ms": 10808.4,
+        "ttft_ms": 6459.19,
+        "decode_tok_s": 44.8,
+        "itl_p50_ms": 22.32,
+        "itl_p99_ms": 22.59,
+        "hbm_gbs": 252.8,
+        "active_weight_gb": 5.489,
+        "vram_mib": 19403,
+        "rss_mib": 474
+      },
+      "llama_iq4_nl": {
+        "tg_tok_s": 71.238544
+      }
+    },
+    "w3": {
+      "flint_nvfp4_int8kv": {
+        "raw": "model=inkling2-mini-nvfp4.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=16384 gen=256 runs=3 | cold=3684.5ms ttft=28500.35ms (p99=28516.82ms) decode=30.5 tok/s (p99=30.5 itl_p50=32.82ms itl_p99=32.95ms) hbm=178.3 GB/s (17.7% peak) active_w=5.489 GB vram=19601 MiB rss=475 MiB",
+        "cold_ms": 3684.5,
+        "ttft_ms": 28500.35,
+        "decode_tok_s": 30.5,
+        "itl_p50_ms": 32.82,
+        "itl_p99_ms": 32.95,
+        "hbm_gbs": 178.3,
+        "active_weight_gb": 5.489,
+        "vram_mib": 19601,
+        "rss_mib": 475
+      },
+      "llama_iq4_nl": {
+        "tg_tok_s": 67.425087
+      }
+    },
+    "w4": {
+      "flint_nvfp4_1024": {
+        "raw": "model=inkling2-mini-nvfp4.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=1024 gen=1 runs=5 | cold=3623.9ms ttft=1539.26ms (p99=1542.06ms) decode=0.0 tok/s (p99=0.0 itl_p50=0.00ms itl_p99=0.00ms) hbm=0.0 GB/s (0.0% peak) active_w=5.489 GB vram=19393 MiB rss=464 MiB",
+        "cold_ms": 3623.9,
+        "ttft_ms": 1539.26,
+        "decode_tok_s": 0.0,
+        "itl_p50_ms": 0.0,
+        "itl_p99_ms": 0.0,
+        "hbm_gbs": 0.0,
+        "active_weight_gb": 5.489,
+        "vram_mib": 19393,
+        "rss_mib": 464
+      },
+      "llama_iq4_nl_1024": {
+        "pp_tok_s": 2710.860958,
+        "ttft_ms": 377.7397719267312
+      },
+      "flint_nvfp4_4096": {
+        "raw": "model=inkling2-mini-nvfp4.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=4096 gen=1 runs=5 | cold=3734.0ms ttft=6478.76ms (p99=6490.77ms) decode=0.0 tok/s (p99=0.0 itl_p50=0.00ms itl_p99=0.00ms) hbm=0.0 GB/s (0.0% peak) active_w=5.489 GB vram=19393 MiB rss=464 MiB",
+        "cold_ms": 3734.0,
+        "ttft_ms": 6478.76,
+        "decode_tok_s": 0.0,
+        "itl_p50_ms": 0.0,
+        "itl_p99_ms": 0.0,
+        "hbm_gbs": 0.0,
+        "active_weight_gb": 5.489,
+        "vram_mib": 19393,
+        "rss_mib": 464
+      },
+      "llama_iq4_nl_4096": {
+        "pp_tok_s": 2058.606584,
+        "ttft_ms": 1989.695375422932
+      }
+    },
+    "w6": {
+      "flint inkling2.pack": {
+        "p50_s": 4.417,
+        "p99_s": 4.468
+      }
+    },
+    "w7": {
+      "edit_spec_none": {
+        "decode_tok_s": 48.9447,
+        "stats_line": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=3655.0ms ttft=3290.05ms prompt=1868 (cached=0) gen=256 decode=48.9 tok/s (itl p50=20.38ms p99=20.56ms) hbm=274.5 GB/s (27.2% peak) vram=19469/24082 MiB rss=474 MiB"
+      },
+      "edit_spec_ngram": {
+        "decode_tok_s": 167.824,
+        "stats_line": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=4151.1ms ttft=3318.83ms prompt=1868 (cached=0) gen=256 decode=167.8 tok/s (itl p50=4.90ms p99=29.14ms) hbm=192.0 GB/s (19.0% peak) vram=19459/24082 MiB rss=464 MiB spec_accept=79.6% (203/255)"
+      },
+      "edit_lossless_ngram": true
+    },
+    "gates": {}
+  }
+}

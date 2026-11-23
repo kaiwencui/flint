@@ -1,0 +1,38 @@
+{
+  "gpu": "NVIDIA GeForce RTX 5090 32 GB (1,792 GB/s, sm_120a PTX mxf4nvf4 FP4 Tensor Cores, Vast.ai 62038766)",
+  "direct": {
+    "16gb_w1_128": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=128 gen=256 runs=7 | cold=2197.9ms ttft=29.22ms (p99=29.28ms) decode=183.8 tok/s (p99=183.8 itl_p50=5.44ms itl_p99=5.50ms) hbm=669.9 GB/s (37.4% peak) active_w=3.618 GB vram=15925 MiB rss=577 MiB",
+    "16gb_w2_4096": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=4096 gen=256 runs=5 | cold=2192.3ms ttft=890.44ms (p99=890.74ms) decode=167.1 tok/s (p99=167.0 itl_p50=5.98ms itl_p99=6.00ms) hbm=630.8 GB/s (35.2% peak) active_w=3.618 GB vram=16017 MiB rss=579 MiB",
+    "16gb_w3_16384": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=16384 gen=256 runs=3 | cold=2186.1ms ttft=4473.29ms (p99=4476.04ms) decode=157.3 tok/s (p99=157.2 itl_p50=6.36ms itl_p99=6.37ms) hbm=626.5 GB/s (35.0% peak) active_w=3.618 GB vram=16215 MiB rss=579 MiB",
+    "16gb_pp1024": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=1024 gen=1 runs=5 | cold=2194.7ms ttft=220.10ms (p99=220.28ms) decode=0.0 tok/s (p99=0.0 itl_p50=0.00ms itl_p99=0.00ms) hbm=0.0 GB/s (0.0% peak) active_w=3.618 GB vram=16015 MiB rss=571 MiB",
+    "16gb_pp4096": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=4096 gen=1 runs=3 | cold=2179.5ms ttft=892.27ms (p99=892.28ms) decode=0.0 tok/s (p99=0.0 itl_p50=0.00ms itl_p99=0.00ms) hbm=0.0 GB/s (0.0% peak) active_w=3.618 GB vram=16015 MiB rss=571 MiB"
+  },
+  "cli_spec": {
+    "greenfield": {
+      "none": {
+        "decode_tok_s": 185.875,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=2288.4ms ttft=131.64ms prompt=29 (cached=0) gen=256 decode=185.9 tok/s (itl p50=5.37ms p99=5.47ms) hbm=675.5 GB/s (37.7% peak) vram=15991/32202 MiB rss=578 MiB",
+        "text_head": ""
+      },
+      "mtp": {
+        "decode_tok_s": 167.714,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=2282.9ms ttft=31.83ms prompt=29 (cached=0) gen=256 decode=167.7 tok/s (itl p50=4.33ms p99=17.74ms) hbm=212.7 GB/s (11.9% peak) vram=16183/32202 MiB rss=626 MiB spec_accept=27.6% (166/601)",
+        "text_head": ""
+      },
+      "lossless_mtp": 4
+    },
+    "code_edit": {
+      "none": {
+        "decode_tok_s": 168.806,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=2181.3ms ttft=502.24ms prompt=1868 (cached=0) gen=256 decode=168.8 tok/s (itl p50=5.92ms p99=5.93ms) hbm=631.1 GB/s (35.2% peak) vram=16083/32202 MiB rss=579 MiB",
+        "text_head": ""
+      },
+      "mtp": {
+        "decode_tok_s": 386.237,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=2297.5ms ttft=333.73ms prompt=1868 (cached=0) gen=256 decode=386.2 tok/s (itl p50=2.36ms p99=9.22ms) hbm=198.2 GB/s (11.1% peak) vram=16183/32202 MiB rss=626 MiB spec_accept=90.5% (220/243)",
+        "text_head": ""
+      },
+      "lossless_mtp": 256
+    }
+  }
+}

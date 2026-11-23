@@ -1,0 +1,156 @@
+{
+  "gpu": "NVIDIA GeForce RTX 4090 24 GB (24,564 MiB GDDR6X, 1,008 GB/s, sm_89, Vast.ai 62075185)",
+  "model": "thinkingmachines/Inkling-2-Mini (26.4B MoE, inkling2-16gb.pack, 14.51 GiB)",
+  "kv_mode": "WHT-K4V4 (--kv-wht4, 128-pt Hadamard 4-bit K + 4-bit V + BF16 scales = 8.25 GiB @ 1,048,576 tokens)",
+  "gate_a_16k_fidelity": {
+    "int8_vs_bf16": {
+      "cos": 0.99387,
+      "max_diff": 3.0469,
+      "top1_a": 145055,
+      "top1_b": 145055,
+      "top1_match": true
+    },
+    "wht84_vs_bf16": {
+      "cos": 0.992638,
+      "max_diff": 3.3594,
+      "top1_a": 145055,
+      "top1_b": 145055,
+      "top1_match": true
+    },
+    "wht4_vs_bf16": {
+      "cos": 0.987805,
+      "max_diff": 3.875,
+      "top1_a": 145055,
+      "top1_b": 145055,
+      "top1_match": true
+    },
+    "wht4_vs_int8": {
+      "cos": 0.985064,
+      "max_diff": 6.375,
+      "top1_a": 145055,
+      "top1_b": 145055,
+      "top1_match": true
+    }
+  },
+  "context_scaling": [
+    {
+      "seq_len": 128,
+      "bench": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=128 gen=128 runs=5 | cold=2496.8ms ttft=85.35ms (p99=85.99ms) decode=150.0 tok/s (p99=149.9 itl_p50=6.67ms itl_p99=6.71ms) hbm=545.3 GB/s (54.1% peak) active_w=3.618 GB vram=15777 MiB rss=535 MiB"
+    },
+    {
+      "seq_len": 16384,
+      "bench": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=16384 gen=128 runs=3 | cold=2485.2ms ttft=3832.15ms (p99=3832.16ms) decode=134.3 tok/s (p99=134.1 itl_p50=7.44ms itl_p99=7.46ms) hbm=516.1 GB/s (51.2% peak) active_w=3.618 GB vram=15967 MiB rss=536 MiB"
+    },
+    {
+      "seq_len": 65536,
+      "bench": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=65536 gen=64 runs=2 | cold=2418.4ms ttft=21925.58ms (p99=21925.58ms) decode=118.5 tok/s (p99=117.2 itl_p50=8.43ms itl_p99=8.58ms) hbm=504.7 GB/s (50.1% peak) active_w=3.618 GB vram=16363 MiB rss=536 MiB"
+    },
+    {
+      "seq_len": 131072,
+      "bench": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=131072 gen=64 runs=1 | cold=2489.3ms ttft=62933.43ms (p99=62933.43ms) decode=101.2 tok/s (p99=101.2 itl_p50=9.75ms itl_p99=9.90ms) hbm=486.9 GB/s (48.3% peak) active_w=3.618 GB vram=16923 MiB rss=537 MiB"
+    }
+  ],
+  "niah": {
+    "256k": {
+      "tag": "256k",
+      "max_seq_len": 262144,
+      "exact_prompt_tokens": 261976,
+      "gen_tokens": 64,
+      "total_tokens": 262040,
+      "needles": [
+        {
+          "label": "ORION-2",
+          "code": "51928473",
+          "target_frac": 0.15,
+          "actual_tok_pos": 39528
+        },
+        {
+          "label": "HELIOS-6",
+          "code": "83746192",
+          "target_frac": 0.55,
+          "actual_tok_pos": 144789
+        }
+      ],
+      "found": {
+        "51928473": true,
+        "83746192": true
+      },
+      "all_pass": true,
+      "wall_time_s": 261.35,
+      "output_preview": "ORION-2: 51928473\nHELIOS-6: 83746192\n====================\n\n// === SUBSYSTEM_00227 (source: flash_decode.cu, rev=3862) ===\nnamespace sub_00227 {\n#include \"kernels.hpp\"\n#\n",
+      "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=2463.5ms ttft=257499.25ms prompt=261976 (cached=0) gen=64 decode=83.3 tok/s (itl p50=11.91ms p99=12.03ms) hbm=492.7 GB/s (48.9% peak) vram=17823/24082 MiB rss=539 MiB"
+    },
+    "512k": {
+      "tag": "512k",
+      "max_seq_len": 524288,
+      "exact_prompt_tokens": 522701,
+      "gen_tokens": 64,
+      "total_tokens": 522765,
+      "needles": [
+        {
+          "label": "VEGA-3",
+          "code": "27491856",
+          "target_frac": 0.1,
+          "actual_tok_pos": 52325
+        },
+        {
+          "label": "CYGNUS-7",
+          "code": "69182734",
+          "target_frac": 0.5,
+          "actual_tok_pos": 262117
+        },
+        {
+          "label": "LYRA-9",
+          "code": "40581927",
+          "target_frac": 0.9,
+          "actual_tok_pos": 470892
+        }
+      ],
+      "found": {
+        "27491856": true,
+        "69182734": true,
+        "40581927": true
+      },
+      "all_pass": true,
+      "wall_time_s": 754.68,
+      "output_preview": "VEGA-3: 27491856\nCYGNUS-7: 69182734\nLYRA-9: 40581927\n====================\n\n// === SUBSYSTEM_00449 (source: server.cpp, rev=7620) ===\nnamespace sub_00449 {\n#\n",
+      "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=2465.5ms ttft=750423.57ms prompt=522701 (cached=0) gen=64 decode=60.6 tok/s (itl p50=16.40ms p99=16.57ms) hbm=492.0 GB/s (48.8% peak) vram=19935/24082 MiB rss=542 MiB"
+    },
+    "1m": {
+      "tag": "1m",
+      "max_seq_len": 1048576,
+      "exact_prompt_tokens": 1048107,
+      "gen_tokens": 76,
+      "total_tokens": 1048183,
+      "needles": [
+        {
+          "label": "ALPHA-1",
+          "code": "48291736",
+          "target_frac": 0.1,
+          "actual_tok_pos": 105195
+        },
+        {
+          "label": "BETA-5",
+          "code": "91538204",
+          "target_frac": 0.5,
+          "actual_tok_pos": 525482
+        },
+        {
+          "label": "GAMMA-9",
+          "code": "64072915",
+          "target_frac": 0.95,
+          "actual_tok_pos": 996539
+        }
+      ],
+      "found": {
+        "48291736": true,
+        "91538204": true,
+        "64072915": true
+      },
+      "all_pass": true,
+      "wall_time_s": 4603.45,
+      "output_preview": "ALPHA-1: 48291736\nBETA-5: 91538204\nGAMMA-9: 64072915\n[END_OF_ANSWER]\n[END_OF_QUESTION]\n[END_OF_QUESTION]\n[END_OF_QUESTION]\n[END_OF_QUESTION]\n[END_OF_QUESTION]\n[\n",
+      "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=2395.8ms ttft=4598189.02ms prompt=1048107 (cached=0) gen=76 decode=39.8 tok/s (itl p50=25.04ms p99=25.35ms) hbm=499.6 GB/s (49.6% peak) vram=23927/24082 MiB rss=547 MiB"
+    }
+  }
+}

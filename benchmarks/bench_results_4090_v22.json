@@ -1,0 +1,53 @@
+{
+  "gpu": "NVIDIA GeForce RTX 4090 24 GB (24,564 MiB GDDR6X, 1,008 GB/s, sm_89, Vast.ai 62247679)",
+  "model": "thinkingmachines/Inkling-2-Mini (26.4B MoE, inkling2-16gb.pack, 14.51 GiB)",
+  "gate_a_16k": {
+    "cos": 0.98386,
+    "top1_wht4": 145055,
+    "top1_bf16": 145055,
+    "top1_match": true
+  },
+  "niah": {
+    "256k": {
+      "all_pass": true,
+      "found": {
+        "51928473": true,
+        "83746192": true
+      },
+      "wall_time_s": 256.57,
+      "output_preview": "ORION-2: 51928473\nHELIOS-6: 83746192\n================================================================================\n\n// === SUBSYSTEM_00221 (source: rope_kv.cu, rev=3763) ===\nnamespace sub_00221 {\n#",
+      "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=2436.2ms ttft=252789.29ms prompt=260864 (cached=0) gen=64 decode=80.3 tok/s (itl p50=12.31ms p99=12.85ms) hbm=474.7 GB/s (47.1% peak) vram=17825/24082 MiB rss=539 MiB",
+      "kv_log": "",
+      "prompt_tokens": 260864
+    }
+  },
+  "kv_snapshot": {
+    "512k_save": {
+      "all_pass": true,
+      "found": {},
+      "wall_time_s": 772.13,
+      "output_preview": "//\n",
+      "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=2426.4ms ttft=769017.00ms prompt=521724 (cached=0) gen=1 decode=0.0 tok/s (itl p50=0.00ms p99=0.00ms) hbm=0.0 GB/s (0.0% peak) vram=19931/24082 MiB rss=535 MiB",
+      "kv_log": "[flint kv] saved 521724 tokens (4.19 GiB) -> /workspace/repo_512k.flkv in 1.30s",
+      "body_tokens": 521724,
+      "file_mib": 4295.63
+    },
+    "512k_load_niah": {
+      "all_pass": true,
+      "found": {
+        "27491856": true,
+        "69182734": true,
+        "40581927": true
+      },
+      "wall_time_s": 6.02,
+      "output_preview": "VEGA-3: 27491856\nCYGNUS-7: 69182734\nLYRA-9: 40581927\n================================================================================\n[SECRET_AUDIT_RECORD] The exact 8-digit verification passkey for p",
+      "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=2447.2ms ttft=1971.33ms prompt=521788 (cached=521724) gen=64 decode=57.7 tok/s (itl p50=17.11ms p99=17.97ms) hbm=467.9 GB/s (46.4% peak) vram=19937/24082 MiB rss=534 MiB",
+      "kv_log": "[flint kv] loaded 521724 tokens (4.19 GiB) <- /workspace/repo_512k.flkv in 0.74s"
+    }
+  },
+  "v22_final_ldg128_lop3": {
+    "512k_load_niah": "[flint kv] loaded 521724 tokens (4.19 GiB) <- /workspace/repo_512k.flkv in 1.62s\nVEGA-3: 27491856\nCYGNUS-7: 69182734\nLYRA-9: 40581927\n================================================================================\n[SECRET_AUDIT_RECORD] The exact 8-digit verification passkey for project VEGA-[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=2513.2ms ttft=2911.74ms prompt=521788 (cached=521724) gen=64 decode=67.1 tok/s (itl p50=14.77ms p99=15.53ms) hbm=544.3 GB/s (54.0% peak) vram=19935/24082 MiB rss=534 MiB",
+    "128k_bench": "[flint prefill] 65536 / 131072 tok (50.0%) | 21.8s | 3001 tok/s\n[flint prefill] 131072 / 131072 tok (100.0%) | 61.0s | 2150 tok/s\nmodel=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=131072 gen=64 runs=1 | cold=2500.7ms ttft=60973.71ms (p99=60973.71ms) decode=106.5 tok/s (p99=106.5 itl_p50=9.30ms itl_p99=9.35ms) hbm=512.6 GB/s (50.8% peak) active_w=3.618 GB vram=16923 MiB rss=537 MiB",
+    "256k_bench": "[flint prefill] 65536 / 262144 tok (25.0%) | 21.9s | 2990 tok/s\n[flint prefill] 131072 / 262144 tok (50.0%) | 60.4s | 2171 tok/s\n[flint prefill] 196608 / 262144 tok (75.0%) | 115.6s | 1701 tok/s\n[flint prefill] 262144 / 262144 tok (100.0%) | 188.0s | 1394 tok/s\nmodel=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=262144 gen=64 runs=1 | cold=2449.0ms ttft=188046.16ms (p99=188046.16ms) decode=87.1 tok/s (p99=87.1 itl_p50=11.38ms itl_p99=11.52ms) hbm=515.5 GB/s (51.1% peak) active_w=3.618 GB vram=17887 MiB rss=536 MiB"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "gpu": "NVIDIA GeForce RTX 4060 Ti 16 GB (16,380 MiB GDDR6, 288 GB/s, sm_89, Vast.ai 61939234)",
+  "direct": {
+    "w1_128": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4060 Ti quant=nvfp4 seq=128 gen=256 runs=5 | cold=11062.1ms ttft=188.83ms (p99=202.74ms) decode=60.3 tok/s (p99=60.0 itl_p50=16.60ms itl_p99=16.75ms) hbm=219.7 GB/s (76.3% peak) active_w=3.618 GB vram=15397 MiB rss=547 MiB",
+    "w2_4096": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4060 Ti quant=nvfp4 seq=4096 gen=256 runs=3 | cold=6783.6ms ttft=3264.36ms (p99=3336.11ms) decode=57.8 tok/s (p99=57.6 itl_p50=17.33ms itl_p99=17.45ms) hbm=218.2 GB/s (75.8% peak) active_w=3.618 GB vram=15489 MiB rss=548 MiB",
+    "w3_16384": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4060 Ti quant=nvfp4 seq=16384 gen=128 runs=2 | cold=4416.4ms ttft=15552.24ms (p99=15552.24ms) decode=55.3 tok/s (p99=54.8 itl_p50=18.24ms itl_p99=18.31ms) hbm=220.4 GB/s (76.5% peak) active_w=3.618 GB vram=15687 MiB rss=548 MiB",
+    "pp1024": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4060 Ti quant=nvfp4 seq=1024 gen=1 runs=3 | cold=8729.2ms ttft=829.74ms (p99=829.75ms) decode=0.0 tok/s (p99=0.0 itl_p50=0.00ms itl_p99=0.00ms) hbm=0.0 GB/s (0.0% peak) active_w=3.618 GB vram=15483 MiB rss=542 MiB",
+    "pp4096": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4060 Ti quant=nvfp4 seq=4096 gen=1 runs=2 | cold=7896.9ms ttft=3354.66ms (p99=3354.66ms) decode=0.0 tok/s (p99=0.0 itl_p50=0.00ms itl_p99=0.00ms) hbm=0.0 GB/s (0.0% peak) active_w=3.618 GB vram=15483 MiB rss=542 MiB"
+  },
+  "cli_spec": {
+    "greenfield": {
+      "none": {
+        "decode_tok_s": 59.9765,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 4060 Ti quant=nvfp4 cold_start=6770.8ms ttft=1005.85ms prompt=29 (cached=0) gen=256 decode=60.0 tok/s (itl p50=16.41ms p99=16.71ms) hbm=218.0 GB/s (75.7% peak) vram=15397/15949 MiB rss=528 MiB"
+      },
+      "mtp": {
+        "decode_tok_s": 51.9408,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 4060 Ti quant=nvfp4 cold_start=4698.5ms ttft=192.59ms prompt=29 (cached=0) gen=256 decode=51.9 tok/s (itl p50=13.78ms p99=56.09ms) hbm=66.6 GB/s (23.1% peak) vram=15529/15949 MiB rss=531 MiB spec_accept=26.6% (165/621)"
+      },
+      "lossless_mtp": 181
+    },
+    "code_edit": {
+      "none": {
+        "decode_tok_s": 58.2891,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 4060 Ti quant=nvfp4 cold_start=4437.9ms ttft=3988.93ms prompt=1868 (cached=0) gen=256 decode=58.3 tok/s (itl p50=17.00ms p99=17.25ms) hbm=217.9 GB/s (75.7% peak) vram=15489/15949 MiB rss=548 MiB"
+      },
+      "mtp": {
+        "decode_tok_s": 119.809,
+        "stats": "[flint stats] backend=NVIDIA GeForce RTX 4060 Ti quant=nvfp4 cold_start=8173.8ms ttft=3294.26ms prompt=1868 (cached=0) gen=256 decode=119.8 tok/s (itl p50=7.54ms p99=28.31ms) hbm=61.5 GB/s (21.3% peak) vram=15529/15949 MiB rss=551 MiB spec_accept=90.5% (220/243)"
+      },
+      "lossless_mtp": 256
+    }
+  }
+}

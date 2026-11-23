@@ -1,0 +1,11 @@
+build/
+flint
+flint-test
+flint-bench
+*.o
+*.d
+*.pack
+.venv/
+models/
+ncu_reports/
+compile_commands.json

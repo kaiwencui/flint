@@ -1,0 +1,59 @@
+{
+  "gpu": "NVIDIA GeForce RTX 5090 (32 GB GDDR7, 1,792 GB/s, sm_120, Vast.ai 61922131)",
+  "direct": {
+    "fp8_w1_128": "model=inkling2-mini-fp8.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=128 gen=256 runs=7 | cold=7411.2ms ttft=60.71ms (p99=60.79ms) decode=178.5 tok/s (p99=178.5 itl_p50=5.60ms itl_p99=5.67ms) hbm=671.8 GB/s (37.5% peak) active_w=3.738 GB vram=18247 MiB rss=577 MiB",
+    "fp8_w2_4096": "model=inkling2-mini-fp8.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=4096 gen=256 runs=5 | cold=2541.1ms ttft=1078.69ms (p99=1080.24ms) decode=162.5 tok/s (p99=162.5 itl_p50=6.15ms itl_p99=6.18ms) hbm=632.9 GB/s (35.3% peak) active_w=3.738 GB vram=18339 MiB rss=609 MiB",
+    "fp8_w3_16384": "model=inkling2-mini-fp8.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=16384 gen=256 runs=3 | cold=2528.9ms ttft=5769.60ms (p99=5780.81ms) decode=152.8 tok/s (p99=152.8 itl_p50=6.54ms itl_p99=6.57ms) hbm=627.0 GB/s (35.0% peak) active_w=3.738 GB vram=18537 MiB rss=610 MiB",
+    "nvfp4_w1_128": "model=inkling2-mini-nvfp4.pack backend=NVIDIA GeForce RTX 5090 quant=nvfp4 seq=128 gen=256 runs=5 | cold=7286.3ms ttft=56.90ms (p99=56.97ms) decode=149.5 tok/s (p99=149.5 itl_p50=6.68ms itl_p99=6.75ms) hbm=824.7 GB/s (46.0% peak) active_w=5.489 GB vram=19551 MiB rss=569 MiB"
+  },
+  "cli_spec": {
+    "fp8": {
+      "greenfield": {
+        "none": {
+          "decode_tok_s": 179.731,
+          "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=8695.5ms ttft=142.18ms prompt=29 (cached=0) gen=256 decode=179.7 tok/s (itl p50=5.55ms p99=5.64ms) hbm=674.6 GB/s (37.6% peak) vram=18313/32202 MiB rss=568 MiB"
+        },
+        "mtp": {
+          "decode_tok_s": 178.324,
+          "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=2868.4ms ttft=41.58ms prompt=29 (cached=0) gen=256 decode=178.3 tok/s (itl p50=3.49ms p99=17.80ms) hbm=217.9 GB/s (12.2% peak) vram=18545/32202 MiB rss=616 MiB spec_accept=30.3% (172/567)"
+        },
+        "lossless_mtp": 17
+      },
+      "code_edit": {
+        "none": {
+          "decode_tok_s": 163.876,
+          "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=2541.0ms ttft=1274.51ms prompt=1868 (cached=0) gen=256 decode=163.9 tok/s (itl p50=6.09ms p99=6.11ms) hbm=632.2 GB/s (35.3% peak) vram=18405/32202 MiB rss=609 MiB"
+        },
+        "mtp": {
+          "decode_tok_s": 387.101,
+          "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=2679.3ms ttft=1032.94ms prompt=1868 (cached=0) gen=256 decode=387.1 tok/s (itl p50=2.36ms p99=9.12ms) hbm=205.0 GB/s (11.4% peak) vram=18545/32202 MiB rss=620 MiB spec_accept=90.5% (220/243)"
+        },
+        "lossless_mtp": 256
+      }
+    },
+    "nvfp4": {
+      "greenfield": {
+        "none": {
+          "decode_tok_s": 150.449,
+          "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=7361.4ms ttft=133.96ms prompt=29 (cached=0) gen=256 decode=150.4 tok/s (itl p50=6.64ms p99=6.73ms) hbm=828.2 GB/s (46.2% peak) vram=19617/32202 MiB rss=568 MiB"
+        },
+        "mtp": {
+          "decode_tok_s": 183.45,
+          "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=2795.4ms ttft=50.67ms prompt=29 (cached=0) gen=256 decode=183.5 tok/s (itl p50=3.55ms p99=18.14ms) hbm=312.9 GB/s (17.5% peak) vram=19849/32202 MiB rss=566 MiB spec_accept=32.8% (176/537)"
+        },
+        "lossless_mtp": 150
+      },
+      "code_edit": {
+        "none": {
+          "decode_tok_s": 138.99,
+          "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=2724.1ms ttft=1250.19ms prompt=1868 (cached=0) gen=256 decode=139.0 tok/s (itl p50=7.18ms p99=7.22ms) hbm=779.6 GB/s (43.5% peak) vram=19709/32202 MiB rss=609 MiB"
+        },
+        "mtp": {
+          "decode_tok_s": 371.941,
+          "stats": "[flint stats] backend=NVIDIA GeForce RTX 5090 quant=nvfp4 cold_start=2792.9ms ttft=1045.76ms prompt=1868 (cached=0) gen=256 decode=371.9 tok/s (itl p50=2.41ms p99=6.40ms) hbm=294.5 GB/s (16.4% peak) vram=19849/32202 MiB rss=612 MiB spec_accept=89.0% (219/246)"
+        },
+        "lossless_mtp": 256
+      }
+    }
+  }
+}
