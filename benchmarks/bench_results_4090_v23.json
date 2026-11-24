@@ -1,0 +1,84 @@
+{
+  "gpu": "NVIDIA GeForce RTX 4090 24 GB (24,564 MiB GDDR6X, 1,008 GB/s, sm_89, Vast.ai 62267384)",
+  "model": "thinkingmachines/Inkling-2-Mini (26.4B MoE, inkling2-16gb.pack, 14.51 GiB)",
+  "kernel": "64x64 Raw PTX FlashAttention-2 (ldmatrix.x4/x2/x2.trans + mma.sync.aligned.m16n8k16 + in-register softmax)",
+  "gate_a_16k": {
+    "wht84_vs_bf16": {
+      "cos": 0.991634,
+      "max_diff": 3.6562,
+      "top1_a": 145055,
+      "top1_b": 145055,
+      "top1_match": true
+    },
+    "wht4_vs_bf16": {
+      "cos": 0.990761,
+      "max_diff": 3.8438,
+      "top1_a": 145055,
+      "top1_b": 145055,
+      "top1_match": true
+    }
+  },
+  "bench_scaling": {
+    "131072": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=131072 gen=64 runs=1 | cold=2037.6ms ttft=41639.44ms (p99=41639.44ms) decode=106.8 tok/s (p99=106.8 itl_p50=9.25ms itl_p99=9.29ms) hbm=514.0 GB/s (51.0% peak) active_w=3.618 GB vram=16923 MiB rss=537 MiB",
+    "262144": "model=inkling2-16gb.pack backend=NVIDIA GeForce RTX 4090 quant=nvfp4 seq=262144 gen=64 runs=1 | cold=2074.9ms ttft=117439.46ms (p99=117439.46ms) decode=87.2 tok/s (p99=87.2 itl_p50=11.35ms itl_p99=11.76ms) hbm=516.0 GB/s (51.2% peak) active_w=3.618 GB vram=17887 MiB rss=537 MiB"
+  },
+  "niah": {
+    "256k": {
+      "exact_prompt_tokens": 260852,
+      "needles": [
+        {
+          "label": "ORION-2",
+          "code": "51928473",
+          "target_frac": 0.15,
+          "actual_tok_pos": 39831
+        },
+        {
+          "label": "HELIOS-6",
+          "code": "83746192",
+          "target_frac": 0.55,
+          "actual_tok_pos": 143632
+        }
+      ],
+      "found": {
+        "51928473": true,
+        "83746192": true
+      },
+      "all_pass": true,
+      "wall_time_s": 191.43,
+      "output_preview": "ORION-2: 51928473\nHELIOS-6: 83746192\n================================================================================\n[SECRET_AUDIT_RECORD] The exact 8-digit verification passkey for project ORION-2 i",
+      "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=2017.8ms ttft=188156.21ms prompt=260852 (cached=0) gen=64 decode=89.7 tok/s (itl p50=11.05ms p99=11.18ms) hbm=530.0 GB/s (52.6% peak) vram=17823/24082 MiB rss=539 MiB"
+    },
+    "512k": {
+      "exact_prompt_tokens": 521763,
+      "needles": [
+        {
+          "label": "VEGA-3",
+          "code": "27491856",
+          "target_frac": 0.1,
+          "actual_tok_pos": 52449
+        },
+        {
+          "label": "CYGNUS-7",
+          "code": "69182734",
+          "target_frac": 0.5,
+          "actual_tok_pos": 262311
+        },
+        {
+          "label": "LYRA-9",
+          "code": "40581927",
+          "target_frac": 0.9,
+          "actual_tok_pos": 469902
+        }
+      ],
+      "found": {
+        "27491856": true,
+        "69182734": true,
+        "40581927": true
+      },
+      "all_pass": true,
+      "wall_time_s": 512.07,
+      "output_preview": "VEGA-3: 27491856\nCYGNUS-7: 69182734\nLYRA-9: 40581927\n================================================================================\n[SECRET_AUDIT_RECORD] The exact 8-digit verification passkey for p",
+      "stats": "[flint stats] backend=NVIDIA GeForce RTX 4090 quant=nvfp4 cold_start=2050.0ms ttft=508345.29ms prompt=521763 (cached=0) gen=64 decode=63.4 tok/s (itl p50=16.12ms p99=16.68ms) hbm=514.7 GB/s (51.1% peak) vram=19935/24082 MiB rss=542 MiB"
+    }
+  }
+}

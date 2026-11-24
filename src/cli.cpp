@@ -9,15 +9,15 @@ namespace flint {
 
 void print_version(std::ostream& out) {
 #if defined(FLINT_CUDA) && FLINT_CUDA == 1
-    out << "flint 2.2.0 (C++23 + CUDA)\n";
+    out << "flint 2.3.0 (C++23 + CUDA)\n";
 #else
-    out << "flint 2.2.0 (C++23, CPU-reference)\n";
+    out << "flint 2.3.0 (C++23, CPU-reference)\n";
 #endif
 }
 
 void print_help(std::ostream& out) {
     out <<
-R"(flint 2.2.0 — Zero-dependency single-user (batch=1) C++23 + CUDA LLM engine for consumer NVIDIA GPUs
+R"(flint 2.3.0 — Zero-dependency single-user (batch=1) C++23 + CUDA LLM engine for consumer NVIDIA GPUs
 
 USAGE:
     flint run <model_dir_or_pack> -p "prompt" [OPTIONS]

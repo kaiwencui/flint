@@ -1,5 +1,4 @@
 #include "inkling2_common.cuh"
-#include <mma.h>
 
 namespace flint::cuda {
 
@@ -458,8 +457,40 @@ __global__ void inkling_rel_attn_reduce_gate_sink_wht_kernel(
     attn_out[o_off + 3] = __float2bfloat16_rn(a3 * sigmoid_f32(__bfloat162float(gate[o_off + 3])) * sink_mul);
 }
 
-// 9d. High-Occupancy 3-Head GQA-Shared 16-Token KV Tile WMMA Tensor-Core Global Prefill
-// Grid: (n_kv_heads=8, (M+15)/16) -> 256-512 blocks; 3 warps (96 threads) share 1 unpacked KV tile in 27.6 KB SMEM (3 blocks/SM = 9 warps/SM, 0 spills).
+// Raw PTX m16n8k16 BF16->FP32 Tensor-Core MMA & ldmatrix helpers (sm_80+)
+__device__ __forceinline__ void mma_m16n8k16_bf16(
+    f32& d0, f32& d1, f32& d2, f32& d3,
+    u32 a0, u32 a1, u32 a2, u32 a3,
+    u32 b0, u32 b1) {
+    asm volatile(
+        "mma.sync.aligned.m16n8k16.row.col.f32.bf16.bf16.f32 "
+        "{%0, %1, %2, %3}, {%4, %5, %6, %7}, {%8, %9}, {%0, %1, %2, %3};\n"
+        : "+f"(d0), "+f"(d1), "+f"(d2), "+f"(d3)
+        : "r"(a0), "r"(a1), "r"(a2), "r"(a3), "r"(b0), "r"(b1));
+}
+
+__device__ __forceinline__ void ldmatrix_x4(u32& r0, u32& r1, u32& r2, u32& r3, const void* smem_ptr) {
+    u32 addr = static_cast<u32>(__cvta_generic_to_shared(smem_ptr));
+    asm volatile("ldmatrix.sync.aligned.m8n8.x4.shared.b16 {%0, %1, %2, %3}, [%4];\n"
+                 : "=r"(r0), "=r"(r1), "=r"(r2), "=r"(r3) : "r"(addr));
+}
+
+__device__ __forceinline__ void ldmatrix_x2(u32& r0, u32& r1, const void* smem_ptr) {
+    u32 addr = static_cast<u32>(__cvta_generic_to_shared(smem_ptr));
+    asm volatile("ldmatrix.sync.aligned.m8n8.x2.shared.b16 {%0, %1}, [%2];\n"
+                 : "=r"(r0), "=r"(r1) : "r"(addr));
+}
+
+__device__ __forceinline__ void ldmatrix_x2_trans(u32& r0, u32& r1, const void* smem_ptr) {
+    u32 addr = static_cast<u32>(__cvta_generic_to_shared(smem_ptr));
+    asm volatile("ldmatrix.sync.aligned.m8n8.x2.trans.shared.b16 {%0, %1}, [%2];\n"
+                 : "=r"(r0), "=r"(r1) : "r"(addr));
+}
+
+// 9d. Canonical 128x64 (8-Warp, 256-Thread) Raw PTX FlashAttention-2 Global Prefill
+// Grid: (n_q_heads=24, (M+127)/128), Block: 256 threads (8 warps x 16 Q rows = 128 Q rows x 64 KV tokens).
+// Full dual-issue SM saturation (2 warps per warp scheduler), 2x less KV unpack than 64x64,
+// zero sm_S / sm_P round-trips, 60.4 KB dynamic SMEM, 0 stack frame, 0 spills.
 template <bool K_IS_4BIT>
 __global__ void inkling_global_attn_prefill_wmma_wht_kernel(
     const __nv_bfloat16* __restrict__ q,
@@ -474,34 +505,30 @@ __global__ void inkling_global_attn_prefill_wmma_wht_kernel(
     const i32* __restrict__ d_block_table,
     __nv_bfloat16* __restrict__ attn_out,
     u32 start_pos, u32 M, u32 n_q_heads, u32 n_kv_heads, u32 block_size) {
-    using namespace nvcuda;
-    constexpr u32 GQA = 3u;
-    const u32 kvh    = blockIdx.x;
-    const u32 q_tile = blockIdx.y * 16u;
-    const u32 tid    = threadIdx.x; // 0..95 (3 warps = 3 GQA Q heads)
-    const u32 wid    = tid >> 5;    // 0..2
+    constexpr int STRIDE = 136; // 128 + 8 BF16 pad (272 B = 16 B aligned, zero 32-bank conflicts)
+    const u32 qh     = blockIdx.x;
+    const u32 q_tile = blockIdx.y * 128u;
+    const u32 tid    = threadIdx.x; // 0..255 (8 warps)
+    const u32 wid    = tid >> 5;    // 0..7
     const int lane   = static_cast<int>(tid & 31u);
-    const u32 qh     = kvh * GQA + wid;
+    const int gid    = lane >> 2;   // 0..7
+    const int tid4   = lane & 3;    // 0..3
+    const u32 kvh    = qh / (n_q_heads / n_kv_heads);
+    const u32 qr_base = wid * 16u;
     const f32 qk_scale = rsqrtf(128.0f);
+    constexpr f32 kLog2E = 1.4426950408889634f;
 
-    __shared__ __nv_bfloat16 sm_Q[GQA][16][128];   // 12 KB
-    __shared__ f32           sm_R[GQA][16][16];    // 3 KB
-    __shared__ union {
-        struct {
-            __nv_bfloat16 K[16][128];              // 4 KB
-            __nv_bfloat16 V[16][128];              // 4 KB
-        } kv;
-        f32 O_f32[16][128];                        // 8 KB (reuses KV SMEM in epilogue)
-    } sm_u;                                        // 8 KB
-    __shared__ f32           sm_S[GQA][16][16];    // 3 KB
-    __shared__ __nv_bfloat16 sm_P[GQA][16][16];    // 1.5 KB
-    __shared__ f32           sm_m[GQA][16];
-    __shared__ f32           sm_l[GQA][16];
-    __shared__ f32           sm_ep[GQA][16];
-    // Total static SMEM = 28.0 KB -> fits 3 blocks/SM (9 warps/SM) with <=128 regs & 0 spills
+    // Dynamic SMEM layout (60,416 B total, 16-byte aligned):
+    //   sm_Q[128][136] BF16 (34,816 B) + sm_KV[64][136] BF16 (17,408 B) + sm_R[128][16] f32 (8,192 B)
+    extern __shared__ u8 smem_raw[];
+    __nv_bfloat16 (*sm_Q)[STRIDE]  = reinterpret_cast<__nv_bfloat16 (*)[STRIDE]>(smem_raw);
+    __nv_bfloat16 (*sm_KV)[STRIDE] = reinterpret_cast<__nv_bfloat16 (*)[STRIDE]>(smem_raw + 128ULL * STRIDE * sizeof(__nv_bfloat16));
+    f32           (*sm_R)[16]      = reinterpret_cast<f32 (*)[16]>(smem_raw + (128ULL + 64ULL) * STRIDE * sizeof(__nv_bfloat16));
 
-    for (u32 qr = 0; qr < 16u; ++qr) {
-        u32 m = q_tile + qr;
+    // Load 128 Q rows (16 per warp) and apply 128-pt WHT once when K_IS_4BIT
+    for (u32 r_i = 0; r_i < 16u; ++r_i) {
+        u32 qr = qr_base + r_i;
+        u32 m  = q_tile + qr;
         f32 q0 = 0.0f, q1 = 0.0f, q2 = 0.0f, q3 = 0.0f;
         if (m < M) {
             const __nv_bfloat16* qp = q + (static_cast<size_t>(m) * n_q_heads + qh) * 128ULL + lane * 4;
@@ -511,41 +538,62 @@ __global__ void inkling_global_attn_prefill_wmma_wht_kernel(
             q3 = __bfloat162float(qp[3]) * qk_scale;
             if constexpr (K_IS_4BIT) ink_wht128_warp(q0, q1, q2, q3, lane);
         }
-        sm_Q[wid][qr][lane * 4 + 0] = __float2bfloat16_rn(q0);
-        sm_Q[wid][qr][lane * 4 + 1] = __float2bfloat16_rn(q1);
-        sm_Q[wid][qr][lane * 4 + 2] = __float2bfloat16_rn(q2);
-        sm_Q[wid][qr][lane * 4 + 3] = __float2bfloat16_rn(q3);
+        __nv_bfloat162 q01 = __floats2bfloat162_rn(q0, q1);
+        __nv_bfloat162 q23 = __floats2bfloat162_rn(q2, q3);
+        *reinterpret_cast<uint2*>(&sm_Q[qr][lane * 4]) =
+            make_uint2(*reinterpret_cast<const u32*>(&q01), *reinterpret_cast<const u32*>(&q23));
     }
-    for (u32 idx = static_cast<u32>(lane); idx < 16u * 16u; idx += 32u) {
+    for (u32 idx = tid; idx < 128u * 16u; idx += 256u) {
         u32 qr = idx >> 4, j = idx & 15u;
         u32 m  = q_tile + qr;
-        sm_R[wid][qr][j] = (m < M) ? __bfloat162float(r[(static_cast<size_t>(m) * n_q_heads + qh) * 16ULL + j]) : 0.0f;
+        sm_R[qr][j] = (m < M) ? __bfloat162float(r[(static_cast<size_t>(m) * n_q_heads + qh) * 16ULL + j]) : 0.0f;
     }
-    if (lane < 16) { sm_m[wid][lane] = -1e30f; sm_l[wid][lane] = 0.0f; }
     __syncthreads();
 
-    wmma::fragment<wmma::accumulator, 16, 16, 16, f32> o_frag[8];
+    // Per-warp output accumulators: 16 tiles of 16x8 = 16x128 FP32 (64 registers)
+    f32 o_reg[16][4];
     #pragma unroll
-    for (int d = 0; d < 8; ++d) wmma::fill_fragment(o_frag[d], 0.0f);
+    for (int d = 0; d < 16; ++d) {
+        o_reg[d][0] = 0.0f; o_reg[d][1] = 0.0f; o_reg[d][2] = 0.0f; o_reg[d][3] = 0.0f;
+    }
+    f32 m_r0 = -1e30f, m_r1 = -1e30f;
+    f32 l_r0 = 0.0f,   l_r1 = 0.0f;
 
     const u32 block_pos_min = start_pos + q_tile;
-    const u32 block_pos_max = start_pos + min(M, q_tile + 16u) - 1u;
+    const u32 block_pos_max = start_pos + min(M, q_tile + 128u) - 1u;
     const u32 kv_end = block_pos_max + 1u;
 
-    for (u32 kv0 = 0; kv0 < kv_end; kv0 += 16u) {
-        const i32 phys = __ldg(d_block_table + (kv0 / block_size));
-        const size_t blk_scale_base = (static_cast<size_t>(phys) * n_kv_heads + kvh) * block_size;
-        const bool tile_has_rel = (block_pos_min < kv0 + 16u + 1024u);
+    const u32 row0_m = q_tile + qr_base + static_cast<u32>(gid);
+    const u32 row1_m = row0_m + 8u;
+    const u32 row0_pos = start_pos + row0_m;
+    const u32 row1_pos = start_pos + row1_m;
 
-        // 3 warps (96 threads) cooperatively unpack 16 KV tokens once for all 3 GQA Q heads
-        for (u32 kr = wid; kr < 16u; kr += GQA) {
+    const u32 q_ld_row = qr_base + static_cast<u32>(lane & 15);
+    const u32 q_ld_col = static_cast<u32>((lane >> 4) * 8);
+    const u32 k_ld_row = static_cast<u32>(lane & 7);
+    const u32 k_ld_col = static_cast<u32>(((lane >> 3) & 1) * 8);
+    const u32 v_ld_row = static_cast<u32>(lane & 15);
+
+    for (u32 kv0 = 0; kv0 < kv_end; kv0 += 64u) {
+        // Keep 4 block bases in scalar registers (0 bytes stack frame)
+        const size_t b0 = (static_cast<size_t>(__ldg(d_block_table + (kv0 / block_size))) * n_kv_heads + kvh) * block_size;
+        const size_t b1 = (kv0 + 16u < kv_end) ? (static_cast<size_t>(__ldg(d_block_table + ((kv0 + 16u) / block_size))) * n_kv_heads + kvh) * block_size : 0ULL;
+        const size_t b2 = (kv0 + 32u < kv_end) ? (static_cast<size_t>(__ldg(d_block_table + ((kv0 + 32u) / block_size))) * n_kv_heads + kvh) * block_size : 0ULL;
+        const size_t b3 = (kv0 + 48u < kv_end) ? (static_cast<size_t>(__ldg(d_block_table + ((kv0 + 48u) / block_size))) * n_kv_heads + kvh) * block_size : 0ULL;
+
+        const bool tile_has_rel = (block_pos_min < kv0 + 64u + 1024u);
+        const bool tile_causal_edge = (kv0 + 63u >= block_pos_min) || (q_tile + 128u > M);
+
+        // Stage 1: 8 warps (256 threads) unpack 64 K tokens (only 8 tokens/warp)
+        #pragma unroll 4
+        for (u32 kr = wid; kr < 64u; kr += 8u) {
             u32 t = kv0 + kr;
-            auto* k_dst = reinterpret_cast<uint2*>(&sm_u.kv.K[kr][lane * 4]);
-            auto* v_dst = reinterpret_cast<uint2*>(&sm_u.kv.V[kr][lane * 4]);
+            auto* k_dst = reinterpret_cast<uint2*>(&sm_KV[kr][lane * 4]);
             if (t < kv_end) {
-                size_t sc_off = blk_scale_base + kr;
+                u32 bi = kr >> 4;
+                size_t bb = (bi == 0u) ? b0 : ((bi == 1u) ? b1 : ((bi == 2u) ? b2 : b3));
+                size_t sc_off = bb + (kr & 15u);
                 f32 ksc = __bfloat162float(__ldg(k_scales_bf16 + sc_off));
-                f32 vsc = __bfloat162float(__ldg(v_scales_bf16 + sc_off));
                 __nv_bfloat162 k01, k23;
                 if constexpr (K_IS_4BIT) {
                     u16 kp = __ldg(reinterpret_cast<const u16*>(k_cache + sc_off * 64ULL) + lane);
@@ -558,114 +606,210 @@ __global__ void inkling_global_attn_prefill_wmma_wht_kernel(
                     k01 = __floats2bfloat162_rn(static_cast<f32>(kw.x) * ksc, static_cast<f32>(kw.y) * ksc);
                     k23 = __floats2bfloat162_rn(static_cast<f32>(kw.z) * ksc, static_cast<f32>(kw.w) * ksc);
                 }
+                *k_dst = make_uint2(*reinterpret_cast<const u32*>(&k01), *reinterpret_cast<const u32*>(&k23));
+            } else {
+                *k_dst = make_uint2(0u, 0u);
+            }
+        }
+        __syncthreads();
+
+        // Stage 2: Raw PTX m16n8k16 Q * K^T -> 16x64 FP32 scores held purely in s_reg[8][4]
+        f32 s_reg[8][4];
+        #pragma unroll
+        for (int nt = 0; nt < 8; ++nt) {
+            s_reg[nt][0] = 0.0f; s_reg[nt][1] = 0.0f; s_reg[nt][2] = 0.0f; s_reg[nt][3] = 0.0f;
+        }
+        #pragma unroll
+        for (int ks = 0; ks < 8; ++ks) {
+            u32 qa0, qa1, qa2, qa3;
+            ldmatrix_x4(qa0, qa1, qa2, qa3, &sm_Q[q_ld_row][ks * 16 + q_ld_col]);
+            #pragma unroll
+            for (int nt = 0; nt < 8; ++nt) {
+                u32 kb0, kb1;
+                ldmatrix_x2(kb0, kb1, &sm_KV[nt * 8 + k_ld_row][ks * 16 + k_ld_col]);
+                mma_m16n8k16_bf16(s_reg[nt][0], s_reg[nt][1], s_reg[nt][2], s_reg[nt][3],
+                                  qa0, qa1, qa2, qa3, kb0, kb1);
+            }
+        }
+
+        // Stage 3: 8 warps unpack 64 V tokens (only 8 tokens/warp) right after Q*K^T finishes
+        __syncthreads();
+        #pragma unroll 4
+        for (u32 kr = wid; kr < 64u; kr += 8u) {
+            u32 t = kv0 + kr;
+            auto* v_dst = reinterpret_cast<uint2*>(&sm_KV[kr][lane * 4]);
+            if (t < kv_end) {
+                u32 bi = kr >> 4;
+                size_t bb = (bi == 0u) ? b0 : ((bi == 1u) ? b1 : ((bi == 2u) ? b2 : b3));
+                size_t sc_off = bb + (kr & 15u);
+                f32 vsc = __bfloat162float(__ldg(v_scales_bf16 + sc_off));
                 u16 vp = __ldg(reinterpret_cast<const u16*>(v_cache + sc_off * 64ULL) + lane);
                 __nv_bfloat162 vsc2 = __float2bfloat162_rn(vsc);
                 __nv_bfloat162 vbi2 = __float2bfloat162_rn(-136.0f * vsc);
                 __nv_bfloat162 v01 = unpack_2nib_bf162(vp, vsc2, vbi2);
                 __nv_bfloat162 v23 = unpack_2nib_bf162(vp >> 8, vsc2, vbi2);
-                *k_dst = make_uint2(*reinterpret_cast<const u32*>(&k01), *reinterpret_cast<const u32*>(&k23));
                 *v_dst = make_uint2(*reinterpret_cast<const u32*>(&v01), *reinterpret_cast<const u32*>(&v23));
             } else {
-                *k_dst = make_uint2(0u, 0u);
                 *v_dst = make_uint2(0u, 0u);
             }
         }
-        __syncthreads();
 
-        wmma::fragment<wmma::accumulator, 16, 16, 16, f32> s_frag;
-        wmma::fill_fragment(s_frag, 0.0f);
-        #pragma unroll
-        for (int k = 0; k < 8; ++k) {
-            wmma::fragment<wmma::matrix_a, 16, 16, 16, __nv_bfloat16, wmma::row_major> qa;
-            wmma::fragment<wmma::matrix_b, 16, 16, 16, __nv_bfloat16, wmma::col_major> kb;
-            wmma::load_matrix_sync(qa, &sm_Q[wid][0][k * 16], 128);
-            wmma::load_matrix_sync(kb, &sm_u.kv.K[0][k * 16], 128);
-            wmma::mma_sync(s_frag, qa, kb, s_frag);
-        }
-        wmma::store_matrix_sync(&sm_S[wid][0][0], s_frag, 16, wmma::mem_row_major);
-        __syncwarp();
-
-        // In-place online softmax directly over sm_S (no scores[] register pressure)
-        if (lane < 16) {
-            const u32 m_row = q_tile + static_cast<u32>(lane);
-            const u32 q_pos = start_pos + m_row;
-            f32 row_max = sm_m[wid][lane];
+        // Stage 4: In-register causal mask, relative bias, and online softmax (no sm_S / sm_P)
+        if (tile_has_rel || tile_causal_edge) {
             #pragma unroll
-            for (int c = 0; c < 16; ++c) {
-                u32 t = kv0 + static_cast<u32>(c);
-                f32 s = -1e30f;
-                if (m_row < M && t <= q_pos) {
-                    s = sm_S[wid][lane][c];
-                    if (tile_has_rel) {
-                        u32 dist = q_pos - t;
-                        if (dist < 1024u) {
-                            const __nv_bfloat16* rp = rel_proj_T + static_cast<size_t>(dist) * 16ULL;
-                            f32 rb = 0.0f;
-                            #pragma unroll
-                            for (int j = 0; j < 16; ++j) rb = fmaf(sm_R[wid][lane][j], __bfloat162float(__ldg(rp + j)), rb);
-                            s += rb;
-                        }
-                    }
-                    row_max = fmaxf(row_max, s);
+            for (int nt = 0; nt < 8; ++nt) {
+                u32 tc0 = kv0 + static_cast<u32>(nt * 8 + tid4 * 2);
+                u32 tc1 = tc0 + 1u;
+                // Row 0 (gid)
+                if (row0_m >= M || tc0 > row0_pos) {
+                    s_reg[nt][0] = -1e30f;
+                } else if (tile_has_rel && (row0_pos - tc0 < 1024u)) {
+                    const __nv_bfloat16* rp = rel_proj_T + static_cast<size_t>(row0_pos - tc0) * 16ULL;
+                    f32 rb = 0.0f;
+                    #pragma unroll
+                    for (int j = 0; j < 16; ++j) rb = fmaf(sm_R[qr_base + gid][j], __bfloat162float(__ldg(rp + j)), rb);
+                    s_reg[nt][0] += rb;
                 }
-                sm_S[wid][lane][c] = s;
+                if (row0_m >= M || tc1 > row0_pos) {
+                    s_reg[nt][1] = -1e30f;
+                } else if (tile_has_rel && (row0_pos - tc1 < 1024u)) {
+                    const __nv_bfloat16* rp = rel_proj_T + static_cast<size_t>(row0_pos - tc1) * 16ULL;
+                    f32 rb = 0.0f;
+                    #pragma unroll
+                    for (int j = 0; j < 16; ++j) rb = fmaf(sm_R[qr_base + gid][j], __bfloat162float(__ldg(rp + j)), rb);
+                    s_reg[nt][1] += rb;
+                }
+                // Row 1 (gid + 8)
+                if (row1_m >= M || tc0 > row1_pos) {
+                    s_reg[nt][2] = -1e30f;
+                } else if (tile_has_rel && (row1_pos - tc0 < 1024u)) {
+                    const __nv_bfloat16* rp = rel_proj_T + static_cast<size_t>(row1_pos - tc0) * 16ULL;
+                    f32 rb = 0.0f;
+                    #pragma unroll
+                    for (int j = 0; j < 16; ++j) rb = fmaf(sm_R[qr_base + gid + 8][j], __bfloat162float(__ldg(rp + j)), rb);
+                    s_reg[nt][2] += rb;
+                }
+                if (row1_m >= M || tc1 > row1_pos) {
+                    s_reg[nt][3] = -1e30f;
+                } else if (tile_has_rel && (row1_pos - tc1 < 1024u)) {
+                    const __nv_bfloat16* rp = rel_proj_T + static_cast<size_t>(row1_pos - tc1) * 16ULL;
+                    f32 rb = 0.0f;
+                    #pragma unroll
+                    for (int j = 0; j < 16; ++j) rb = fmaf(sm_R[qr_base + gid + 8][j], __bfloat162float(__ldg(rp + j)), rb);
+                    s_reg[nt][3] += rb;
+                }
             }
-            f32 ep = (sm_l[wid][lane] > 0.0f) ? __expf(sm_m[wid][lane] - row_max) : 0.0f;
-            f32 l_new = sm_l[wid][lane] * ep;
+        }
+
+        // Row-wise max across the 4 lanes (tid4 = 0..3) owning each row
+        f32 new_m0 = m_r0;
+        f32 new_m1 = m_r1;
+        #pragma unroll
+        for (int nt = 0; nt < 8; ++nt) {
+            new_m0 = fmaxf(new_m0, fmaxf(s_reg[nt][0], s_reg[nt][1]));
+            new_m1 = fmaxf(new_m1, fmaxf(s_reg[nt][2], s_reg[nt][3]));
+        }
+        new_m0 = fmaxf(new_m0, __shfl_xor_sync(0xFFFFFFFFu, new_m0, 1));
+        new_m0 = fmaxf(new_m0, __shfl_xor_sync(0xFFFFFFFFu, new_m0, 2));
+        new_m1 = fmaxf(new_m1, __shfl_xor_sync(0xFFFFFFFFu, new_m1, 1));
+        new_m1 = fmaxf(new_m1, __shfl_xor_sync(0xFFFFFFFFu, new_m1, 2));
+
+        f32 ep0 = (l_r0 > 0.0f) ? exp2f((m_r0 - new_m0) * kLog2E) : 0.0f;
+        f32 ep1 = (l_r1 > 0.0f) ? exp2f((m_r1 - new_m1) * kLog2E) : 0.0f;
+        m_r0 = new_m0;
+        m_r1 = new_m1;
+
+        // Rescale existing o_reg in-place once per 64 tokens
+        #pragma unroll
+        for (int d = 0; d < 16; ++d) {
+            o_reg[d][0] *= ep0; o_reg[d][1] *= ep0;
+            o_reg[d][2] *= ep1; o_reg[d][3] *= ep1;
+        }
+
+        // Exponentiate scores and pack directly into m16n8k16 BF16x2 A-fragments (no shuffles)
+        f32 p_sum0 = 0.0f, p_sum1 = 0.0f;
+        u32 p_reg[4][4];
+        #pragma unroll
+        for (int ks = 0; ks < 4; ++ks) {
+            int n0 = ks * 2, n1 = ks * 2 + 1;
+            f32 p00 = (s_reg[n0][0] > -1e29f) ? exp2f((s_reg[n0][0] - m_r0) * kLog2E) : 0.0f;
+            f32 p01 = (s_reg[n0][1] > -1e29f) ? exp2f((s_reg[n0][1] - m_r0) * kLog2E) : 0.0f;
+            f32 p10 = (s_reg[n0][2] > -1e29f) ? exp2f((s_reg[n0][2] - m_r1) * kLog2E) : 0.0f;
+            f32 p11 = (s_reg[n0][3] > -1e29f) ? exp2f((s_reg[n0][3] - m_r1) * kLog2E) : 0.0f;
+
+            f32 p02 = (s_reg[n1][0] > -1e29f) ? exp2f((s_reg[n1][0] - m_r0) * kLog2E) : 0.0f;
+            f32 p03 = (s_reg[n1][1] > -1e29f) ? exp2f((s_reg[n1][1] - m_r0) * kLog2E) : 0.0f;
+            f32 p12 = (s_reg[n1][2] > -1e29f) ? exp2f((s_reg[n1][2] - m_r1) * kLog2E) : 0.0f;
+            f32 p13 = (s_reg[n1][3] > -1e29f) ? exp2f((s_reg[n1][3] - m_r1) * kLog2E) : 0.0f;
+
+            p_sum0 += (p00 + p01) + (p02 + p03);
+            p_sum1 += (p10 + p11) + (p12 + p13);
+
+            __nv_bfloat162 a0 = __floats2bfloat162_rn(p00, p01);
+            __nv_bfloat162 a1 = __floats2bfloat162_rn(p10, p11);
+            __nv_bfloat162 a2 = __floats2bfloat162_rn(p02, p03);
+            __nv_bfloat162 a3 = __floats2bfloat162_rn(p12, p13);
+            p_reg[ks][0] = *reinterpret_cast<const u32*>(&a0);
+            p_reg[ks][1] = *reinterpret_cast<const u32*>(&a1);
+            p_reg[ks][2] = *reinterpret_cast<const u32*>(&a2);
+            p_reg[ks][3] = *reinterpret_cast<const u32*>(&a3);
+        }
+        p_sum0 += __shfl_xor_sync(0xFFFFFFFFu, p_sum0, 1);
+        p_sum0 += __shfl_xor_sync(0xFFFFFFFFu, p_sum0, 2);
+        p_sum1 += __shfl_xor_sync(0xFFFFFFFFu, p_sum1, 1);
+        p_sum1 += __shfl_xor_sync(0xFFFFFFFFu, p_sum1, 2);
+        l_r0 = l_r0 * ep0 + p_sum0;
+        l_r1 = l_r1 * ep1 + p_sum1;
+
+        __syncthreads(); // Wait for Stage 3 V unpack into sm_KV to complete
+
+        // Stage 5: Raw PTX m16n8k16 P * V -> accumulate directly into o_reg[16][4]
+        #pragma unroll
+        for (int ks = 0; ks < 4; ++ks) {
             #pragma unroll
-            for (int c = 0; c < 16; ++c) {
-                f32 s = sm_S[wid][lane][c];
-                f32 p = (s > -1e29f) ? __expf(s - row_max) : 0.0f;
-                sm_P[wid][lane][c] = __float2bfloat16_rn(p);
-                l_new += p;
+            for (int dt = 0; dt < 16; ++dt) {
+                u32 vb0, vb1;
+                ldmatrix_x2_trans(vb0, vb1, &sm_KV[ks * 16 + v_ld_row][dt * 8]);
+                mma_m16n8k16_bf16(o_reg[dt][0], o_reg[dt][1], o_reg[dt][2], o_reg[dt][3],
+                                  p_reg[ks][0], p_reg[ks][1], p_reg[ks][2], p_reg[ks][3],
+                                  vb0, vb1);
             }
-            sm_m[wid][lane]  = row_max;
-            sm_l[wid][lane]  = l_new;
-            sm_ep[wid][lane] = ep;
-        }
-        __syncwarp();
-
-        const int r0 = lane >> 2;
-        const f32 ep_r0 = sm_ep[wid][r0];
-        const f32 ep_r1 = sm_ep[wid][r0 + 8];
-        #pragma unroll
-        for (int d = 0; d < 8; ++d) {
-            o_frag[d].x[0] *= ep_r0; o_frag[d].x[1] *= ep_r0;
-            o_frag[d].x[4] *= ep_r0; o_frag[d].x[5] *= ep_r0;
-            o_frag[d].x[2] *= ep_r1; o_frag[d].x[3] *= ep_r1;
-            o_frag[d].x[6] *= ep_r1; o_frag[d].x[7] *= ep_r1;
-        }
-
-        wmma::fragment<wmma::matrix_a, 16, 16, 16, __nv_bfloat16, wmma::row_major> pa;
-        wmma::load_matrix_sync(pa, &sm_P[wid][0][0], 16);
-        #pragma unroll
-        for (int d = 0; d < 8; ++d) {
-            wmma::fragment<wmma::matrix_b, 16, 16, 16, __nv_bfloat16, wmma::row_major> vb;
-            wmma::load_matrix_sync(vb, &sm_u.kv.V[0][d * 16], 128);
-            wmma::mma_sync(o_frag[d], pa, vb, o_frag[d]);
         }
         __syncthreads();
     }
 
-    // Store each GQA head's WHT-domain O into reused sm_u.O_f32 one warp at a time, then apply inverse WHT128.
-    for (u32 w_turn = 0; w_turn < GQA; ++w_turn) {
+    // Epilogue: reuse sm_KV (17.4 KB) as f32 sm_O[16][128] (8 KB) + f32 sm_ml[16][2] one warp at a time
+    f32 (*sm_O)[128] = reinterpret_cast<f32 (*)[128]>(sm_KV);
+    __shared__ f32 sm_m_ep[16];
+    __shared__ f32 sm_l_ep[16];
+
+    for (u32 w_turn = 0; w_turn < 8u; ++w_turn) {
         if (wid == w_turn) {
+            if (tid4 == 0) {
+                sm_m_ep[gid]     = m_r0;
+                sm_l_ep[gid]     = l_r0;
+                sm_m_ep[gid + 8] = m_r1;
+                sm_l_ep[gid + 8] = l_r1;
+            }
             #pragma unroll
-            for (int d = 0; d < 8; ++d) {
-                wmma::store_matrix_sync(&sm_u.O_f32[0][d * 16], o_frag[d], 128, wmma::mem_row_major);
+            for (int dt = 0; dt < 16; ++dt) {
+                sm_O[gid][dt * 8 + tid4 * 2 + 0]     = o_reg[dt][0];
+                sm_O[gid][dt * 8 + tid4 * 2 + 1]     = o_reg[dt][1];
+                sm_O[gid + 8][dt * 8 + tid4 * 2 + 0] = o_reg[dt][2];
+                sm_O[gid + 8][dt * 8 + tid4 * 2 + 1] = o_reg[dt][3];
             }
             __syncwarp();
-            for (u32 qr = 0; qr < 16u; ++qr) {
-                u32 m = q_tile + qr;
+            for (u32 r_i = 0; r_i < 16u; ++r_i) {
+                u32 m = q_tile + qr_base + r_i;
                 if (m < M) {
-                    f32 l_val = sm_l[wid][qr];
+                    f32 l_val = sm_l_ep[r_i];
                     f32 inv_l = (l_val > 0.0f) ? (1.0f / l_val) : 0.0f;
-                    f32 a0 = sm_u.O_f32[qr][lane * 4 + 0] * inv_l;
-                    f32 a1 = sm_u.O_f32[qr][lane * 4 + 1] * inv_l;
-                    f32 a2 = sm_u.O_f32[qr][lane * 4 + 2] * inv_l;
-                    f32 a3 = sm_u.O_f32[qr][lane * 4 + 3] * inv_l;
+                    f32 a0 = sm_O[r_i][lane * 4 + 0] * inv_l;
+                    f32 a1 = sm_O[r_i][lane * 4 + 1] * inv_l;
+                    f32 a2 = sm_O[r_i][lane * 4 + 2] * inv_l;
+                    f32 a3 = sm_O[r_i][lane * 4 + 3] * inv_l;
                     ink_wht128_warp(a0, a1, a2, a3, lane);
-                    f32 lse = (l_val > 0.0f) ? (sm_m[wid][qr] + logf(l_val)) : -1e30f;
+                    f32 lse = (l_val > 0.0f) ? (sm_m_ep[r_i] + logf(l_val)) : -1e30f;
                     f32 sink_mul = sigmoid_f32(lse - __bfloat162float(sink[static_cast<size_t>(m) * n_q_heads + qh]));
                     size_t o_off = (static_cast<size_t>(m) * n_q_heads + qh) * 128ULL + static_cast<u32>(lane * 4);
                     attn_out[o_off + 0] = __float2bfloat16_rn(a0 * sigmoid_f32(__bfloat162float(gate[o_off + 0])) * sink_mul);
@@ -743,13 +887,22 @@ void launch_inkling_global_attn_prefill_wmma_wht(
     const i32* d_block_table, __nv_bfloat16* attn_out,
     u32 start_pos, u32 M, u32 n_q_heads, u32 n_kv_heads, u32 block_size,
     bool k_is_4bit, cudaStream_t stream) {
-    dim3 grid(n_kv_heads, (M + 15u) / 16u);
+    constexpr size_t kFa2SmemBytes = (128ULL + 64ULL) * 136ULL * sizeof(__nv_bfloat16) + 128ULL * 16ULL * sizeof(f32);
+    static bool smem_configured = false;
+    if (!smem_configured) {
+        cudaFuncSetAttribute(inkling_global_attn_prefill_wmma_wht_kernel<true>,
+                             cudaFuncAttributeMaxDynamicSharedMemorySize, static_cast<int>(kFa2SmemBytes));
+        cudaFuncSetAttribute(inkling_global_attn_prefill_wmma_wht_kernel<false>,
+                             cudaFuncAttributeMaxDynamicSharedMemorySize, static_cast<int>(kFa2SmemBytes));
+        smem_configured = true;
+    }
+    dim3 grid(n_q_heads, (M + 127u) / 128u);
     if (k_is_4bit) {
-        inkling_global_attn_prefill_wmma_wht_kernel<true><<<grid, 96, 0, stream>>>(
+        inkling_global_attn_prefill_wmma_wht_kernel<true><<<grid, 256, kFa2SmemBytes, stream>>>(
             q, r, gate, sink, rel_proj_T, k_cache, v_cache, k_scales_bf16, v_scales_bf16,
             d_block_table, attn_out, start_pos, M, n_q_heads, n_kv_heads, block_size);
     } else {
-        inkling_global_attn_prefill_wmma_wht_kernel<false><<<grid, 96, 0, stream>>>(
+        inkling_global_attn_prefill_wmma_wht_kernel<false><<<grid, 256, kFa2SmemBytes, stream>>>(
             q, r, gate, sink, rel_proj_T, k_cache, v_cache, k_scales_bf16, v_scales_bf16,
             d_block_table, attn_out, start_pos, M, n_q_heads, n_kv_heads, block_size);
     }

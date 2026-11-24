@@ -88,21 +88,22 @@ Neither `vLLM` nor `SGLang` fits in 24 GB VRAM (`27.2–28.3 GiB`); on 16 GB, `l
 
 Because 40 of `Inkling-2-Mini`'s 48 visits use a fixed `1,024`-token sliding window (`85 MiB` total in INT8), only 8 global visits grow with context. Rotating global Keys and Values with a 128-point orthonormal Walsh-Hadamard transform (`H^T = H, H^2 = I`) into symmetric 4-bit nibbles with BF16 per-head scales (`--kv-wht4`, `WHT-K4V4`) compresses `1,048,576` tokens of global KV cache to `8.25 GiB` (`12.25 GiB` with `--kv-wht84` INT8 K + WHT-4-bit V on 32 GB GPUs) — fitting the entire `26.4B` model and its native `1,048,576`-token dense attention window 100% in VRAM on a single 24 GB RTX 4090 with zero CPU offload and zero token eviction.
 
-Receipts: [`benchmarks/bench_results_4090_1m_v21.json`](benchmarks/bench_results_4090_1m_v21.json), [`benchmarks/bench_results_4090_v22.json`](benchmarks/bench_results_4090_v22.json), and [`benchmarks/bench_results_5090_1m_v21.json`](benchmarks/bench_results_5090_1m_v21.json).
+Receipts: [`benchmarks/bench_results_4090_1m_v21.json`](benchmarks/bench_results_4090_1m_v21.json), [`benchmarks/bench_results_4090_v22.json`](benchmarks/bench_results_4090_v22.json), [`benchmarks/bench_results_4090_v23.json`](benchmarks/bench_results_4090_v23.json), and [`benchmarks/bench_results_5090_1m_v21.json`](benchmarks/bench_results_5090_1m_v21.json).
 
 | GPU & KV Mode (`inkling2-16gb.pack`, `batch = 1`) | Context Length | Decode `tok/s` (`itl p50`) | Prefill / Snapshot Time | Live Peak VRAM (`nvidia-smi` / CUDA) | Host RSS | Multi-Depth NIAH Retrieval |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | **RTX 4090 24 GB (`--kv-wht4`, `WHT-K4V4`)** | `128` | **150.0 tok/s** (`6.67 ms`) | `0.09 s` | `15,777 MiB` (`15.41 GiB`) | `535 MiB` | — |
-| RTX 4090 24 GB (`--kv-wht4`, `WHT-K4V4`) | `16,384` | **134.3 tok/s** (`7.44 ms`) | `3.83 s` | `15,967 MiB` (`15.59 GiB`) | `536 MiB` | `16k` `cos = 0.9878`, `top1 = exact` |
+| RTX 4090 24 GB (`--kv-wht4`, `WHT-K4V4`) | `16,384` | **134.3 tok/s** (`7.44 ms`) | `3.83 s` | `15,967 MiB` (`15.59 GiB`) | `536 MiB` | `16k` `cos = 0.9908`, `top1 = exact` |
 | RTX 4090 24 GB (`--kv-wht4`, `WHT-K4V4`) | `65,536` | **118.5 tok/s** (`8.43 ms`) | `21.93 s` | `16,363 MiB` (`15.98 GiB`) | `536 MiB` | `1/1` pass (`66.6k` @ `20%` depth) |
-| RTX 4090 24 GB (`--kv-wht4`, `WHT-K4V4`) | `131,072` | **106.5 tok/s** (`9.30 ms`) | `60.97 s` | `16,923 MiB` (`16.53 GiB`) | `537 MiB` | — |
-| RTX 4090 24 GB (`--kv-wht4`, `WHT-K4V4`) | `262,144` (`256k`) | **87.1 tok/s** (`11.38 ms`) | `188.0–252.8 s` | `17,887 MiB` (`17.47 GiB`) | `539 MiB` | **`2/2` pass** (`15%`, `55%` depths) |
-| RTX 4090 24 GB (`--kv-wht4`, `WHT-K4V4`) | `521,788` (`512k`) | **67.1 tok/s** (`14.77 ms`) | `750.4 s` *(or **`0.73 s`** `--load-kv`)* | `19,935 MiB` (`19.47 GiB`) | `534 MiB` | **`3/3` pass** (`10%`, `50%`, `90%` depths) |
-| **RTX 4090 24 GB (`--kv-wht4`, `WHT-K4V4`)** | **`1,048,107` (+76 gen)** | **39.8 tok/s** (`25.04 ms`) | `4,598.2 s` | **`23,927 MiB`** (`23.37 / 24.0 GiB`) | **`547 MiB`** | **`3/3` pass** (`10%`, `50%`, `95%` depths) |
-| **RTX 5090 32 GB (`--kv-wht4`, `WHT-K4V4`)** | **`1,048,107` (+76 gen)** | **51.4 tok/s** (`19.42 ms`) | `2,445.5 s` | **`24,269 MiB`** (`23.70 GiB`) | `664 MiB` | Identical greedy path |
-| **RTX 5090 32 GB (`--kv-wht84`, `WHT-K8V4`)** | **`1,048,107` (+76 gen)** | **52.1 tok/s** (`19.11 ms`) | `2,492.0 s` | **`28,365 MiB`** (`27.70 GiB`) | `640 MiB` | **`3/3` pass** (`10%`, `50%`, `95%` depths) |
+| RTX 4090 24 GB (`--kv-wht4`, `WHT-K4V4`) | `131,072` | **106.8 tok/s** (`9.25 ms`) | **`41.64 s`** *(PTX FA2)* | `16,923 MiB` (`16.53 GiB`) | `537 MiB` | — |
+| RTX 4090 24 GB (`--kv-wht4`, `WHT-K4V4`) | `260,852` (`256k`) | **89.7 tok/s** (`11.05 ms`) | **`117.4–188.2 s`** *(PTX FA2)* | `17,823 MiB` (`17.41 GiB`) | `539 MiB` | **`2/2` pass** (`15%`, `55%` depths) |
+| RTX 4090 24 GB (`--kv-wht4`, `WHT-K4V4`) | `521,763` (`512k`) | **67.1–71.9 tok/s** (`13.68 ms`) | **`508.3 s`** *(or **`0.75 s`** `--load-kv`)* | `19,935 MiB` (`19.47 GiB`) | `535 MiB` | **`3/3` pass** (`10%`, `50%`, `90%` depths) |
+| **RTX 4090 24 GB (`--kv-wht4`, `WHT-K4V4`)** | **`1,048,107` (+76 gen)** | **39.8 tok/s** (`25.04 ms`) | `4,598.2 s` *(v2.1)* | **`23,927 MiB`** (`23.37 / 24.0 GiB`) | **`547 MiB`** | **`3/3` pass** (`10%`, `50%`, `95%` depths) |
+| **RTX 5090 32 GB (`--kv-wht4`, `WHT-K4V4`)** | **`1,048,107` (+76 gen)** | **51.4 tok/s** (`19.42 ms`) | `2,445.5 s` *(v2.1)* | **`24,269 MiB`** (`23.70 GiB`) | `664 MiB` | Identical greedy path |
+| **RTX 5090 32 GB (`--kv-wht84`, `WHT-K8V4`)** | **`1,048,107` (+76 gen)** | **52.1 tok/s** (`19.11 ms`) | `2,492.0 s` *(v2.1)* | **`28,365 MiB`** (`27.70 GiB`) | `640 MiB` | **`3/3` pass** (`10%`, `50%`, `95%` depths) |
 
-- **Zero-recompute persistent KV snapshots (`--save-kv` / `--load-kv`):** Dumping a `521,724`-token `WHT-K4V4` KV snapshot (`4.19 GiB`) to NVMe takes `1.30 s`; reloading via double-buffered pinned DMA takes `0.73–1.62 s` (`1.97–2.91 s` total TTFT including query prefill, retrieving all `3/3` needles verbatim at `67.1 tok/s`).
+- **128×64 Raw PTX FlashAttention-2 global prefill (`src/kernels/inkling2_wht.cu`):** Uses 8 warps (256 threads), `ldmatrix.x4` / `ldmatrix.x2` / `ldmatrix.x2.trans`, `mma.sync.aligned.m16n8k16.row.col.f32.bf16.bf16.f32`, PTX `lop3.b32` 4-bit nibble unpack, and 100% in-register online softmax (`0` stack frame, `0` spills), cutting RTX 4090 cold prefill from `62.9 → 41.6 s` (`128k`), `257.5 → 188.2 s` (`256k`, `117.4 s` synthetic), and `750.4 → 508.3 s` (`512k`, `2.1×` faster quadratic global attention).
+- **Zero-recompute persistent KV snapshots (`--save-kv` / `--load-kv`):** Dumping a `521,724`-token `WHT-K4V4` KV snapshot (`4.19 GiB`) to NVMe takes `1.30 s`; reloading via double-buffered pinned DMA takes `0.73–0.75 s` (`1.97–2.04 s` total TTFT including query prefill, retrieving all `3/3` needles verbatim at `67.1–71.9 tok/s`).
 
 ### Track 1 — `Qwen/Qwen2.5-Coder-7B-Instruct` on RTX 4090 & RTX 5090
 
@@ -187,7 +188,7 @@ Four-engine HTTP/SSE comparison on RTX 4090 (`ctx = 17,408`, [`benchmarks/bench_
 | --- | --- | --- |
 | **Gate 1 — Tokenizer (`AutoTokenizer`)** | `100/100` exact | `100/100` exact (`200,058`-vocab `o200k` + `ignore_merges`) |
 | **Gate 2 — Numerical & Greedy Parity** | BF16 `cos = 0.999999` vs. HF; FP8 `cublasLt` `cos = 0.996787, top1 = exact` | `32/32` exact greedy vs. `llama.cpp`; FP8-Attn `cos = 0.999499`; 16 GB pack `cos = 0.997381, top1 = exact` |
-| **Gate 3 — KV Fidelity & PPL** | `--kv-int8`: `cos = 0.999538, PPL = 2.0972`; `--kv-wht4`: `cos = 0.998838, PPL = 2.0993` | `--kv-int8`: `cos = 0.993870` (`16k`); `--kv-wht84`: `cos = 0.992638`; `--kv-wht4`: `cos = 0.987805`, all `top1 = exact`; `3/3` NIAH pass at `1,048,107` tokens |
+| **Gate 3 — KV Fidelity & PPL** | `--kv-int8`: `cos = 0.999538, PPL = 2.0972`; `--kv-wht4`: `cos = 0.998838, PPL = 2.0993` | `--kv-int8`: `cos = 0.993870` (`16k`); `--kv-wht84`: `cos = 0.9916–0.9926`; `--kv-wht4`: `cos = 0.990761` (PTX FA2), all `top1 = exact`; `3/3` NIAH pass at `1,048,107` tokens |
 | **Gate 4 — Lossless Speculative** | `256/256` bit-identical (`ngram`, `draft:0.5B`) | `256/256` bit-identical on `code_edit` (16 / 24 / 32 GB) + BF16-Attn greenfield & edit |
 | **Gate 5 — Sanitizers & Spills** | `0` spills across all 13 `.cu` units; `memcheck`/`racecheck`/`initcheck` clean; host ASan+UBSan `4/4` | `0` spills (`sm_89` & `sm_120a`); `memcheck`/`racecheck`/`initcheck` clean; host ASan+UBSan `4/4` |
 
